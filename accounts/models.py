@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
@@ -13,6 +15,7 @@ class UserManager(BaseUserManager):
             name=name,
             username=username,
             email=self.normalize_email(email),
+            created_at=datetime.now(),
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -39,6 +42,9 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    created_at = models.DateTimeField(
+        auto_now=True,
+    )
 
     objects = UserManager()
 
@@ -46,21 +52,17 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = [
         "email",
         "name",
-        "username",
     ]
 
     def __str__(self):
         return self.name
 
+    def has_perm(self, perm, obj=None):
+        return True
 
-def has_perm(self, perm, obj=None):
-    return True
+    def has_module_perms(self, app_label):
+        return True
 
-
-def has_module_perms(self, app_label):
-    return True
-
-
-@property
-def is_staff(self):
-    return self.is_admin
+    @property
+    def is_staff(self):
+        return self.is_admin
