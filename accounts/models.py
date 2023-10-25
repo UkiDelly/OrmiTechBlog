@@ -6,7 +6,9 @@ from django.db import models
 
 # Create your models here.
 class UserManager(BaseUserManager):
-    def create_user(self, name, username, email, password):
+    def create_user(
+        self, name, username, email, description, password, profile_image=None
+    ):
         if not name:
             raise ValueError("must have user email")
         if not email:
@@ -15,7 +17,9 @@ class UserManager(BaseUserManager):
             name=name,
             username=username,
             email=self.normalize_email(email),
+            description=description,
             created_at=datetime.now(),
+            profile_image=profile_image,
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -26,6 +30,7 @@ class UserManager(BaseUserManager):
             name=name,
             email=self.normalize_email(email),
             username=username,
+            description="",
             password=password,
         )
         user.is_admin = True
@@ -40,11 +45,13 @@ class User(AbstractBaseUser):
         unique=True,
     )
     username = models.CharField(max_length=100, unique=True)
+    description = models.TextField(default=None)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    created_at = models.DateTimeField(
-        auto_now=True,
+    profile_image = models.ImageField(
+        upload_to=f"{username}/profile_image",
     )
+    created_at = models.DateTimeField(auto_now=True)
 
     objects = UserManager()
 
