@@ -45,13 +45,16 @@ class User(AbstractBaseUser):
         unique=True,
     )
     username = models.CharField(max_length=100, unique=True)
+    nickname = models.CharField(max_length=100, default=None)
     description = models.TextField(default=None)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    profile_image = models.ImageField(
-        upload_to=f"{username}/profile_image",
-    )
-    created_at = models.DateTimeField(auto_now=True)
+
+    def get_upload_to(self, filename):
+        return f"profile/{self.username}/{filename}"
+
+    profile_image = models.ImageField(upload_to=get_upload_to, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     objects = UserManager()
 
