@@ -9,9 +9,7 @@ class UserCreationForm(forms.ModelForm):
     email = forms.EmailField(label="Email", widget=forms.EmailInput)
     username = forms.CharField(label="Username", widget=forms.TextInput)
     description = forms.TextInput()
-    profile_image = forms.ImageField(
-        upload_to=f"{username}/profile_image", widget=forms.FileInput
-    )
+    profile_image = forms.ImageField(widget=forms.FileInput)
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
     password2 = forms.CharField(
         label="Password confirmation", widget=forms.PasswordInput
@@ -41,9 +39,7 @@ class UserChangeForm(forms.ModelForm):
     name = forms.CharField(label="Name", widget=forms.TextInput)
     email = forms.EmailField(label="Email", widget=forms.EmailInput)
     description = forms.TextInput()
-    profile_image = forms.ImageField(
-        upload_to=f"{username}/profile_image", widget=forms.FileInput
-    )
+    profile_image = forms.ImageField(widget=forms.FileInput)
     password = ReadOnlyPasswordHashField()
 
     class Meta:
