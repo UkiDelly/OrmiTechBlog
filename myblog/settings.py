@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "ckeditor",
+    "ckeditor_uploader",
     "accounts",
     "blog",
     "storages",
@@ -140,6 +142,9 @@ AUTH_USER_MODEL = "accounts.User"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+CKEDITOR_UPLOAD_PATH = MEDIA_URL
+CKEDITOR_IMAGE_BACKEND = "pillow"
 
 # AWS Setting
 AWS_REGION: Final[str] = "ap-northeast-2"
