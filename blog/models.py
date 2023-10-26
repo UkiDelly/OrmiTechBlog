@@ -35,3 +35,6 @@ class Comment(BaseDateTime):
 
     class Meta:
         db_table = "comment"
+
+    def __str__(self):
+        return self.content
