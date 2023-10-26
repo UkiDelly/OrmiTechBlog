@@ -8,10 +8,37 @@
     <title>Blog</title>
 </head>
 <body>
+
+
+{% if request.user.is_authenticated %}
+    <a href="{% url 'blog:blog_create' %}">새 글 작성</a>
+    <a href="{% url 'accounts:logout' %}">로그아웃</a>
+{% else %}
+    <a href="{% url 'accounts:login' %}">로그인</a>
+    <a href="{% url 'accounts:signup' %}">회원 가입</a>
+{% endif %}
+
 <h1>Blog</h1>
+
+<form action="" method="get">
+    <label>
+        <input type="text" name="q">
+    </label>
+    <input type="submit" value="search">
+</form>
+
 {% for blog in blogs %}
-    <h2>{{ blog.title }}</h2>
+    <img width="100px" height="100px" src="{{ blog.thumbnail.url }}" alt="썸네일">
+    <h2>
+        <a href="{% url 'blog:blog_detail' blog.pk %}">{{ blog.title }}</a></h2>
     <p>{{ blog.author }}</p>
+    {% for category in blog.categorys.all %}
+        <p>{{ category }}</p>
+    {% endfor %}
+
+
+
+
 {% endfor %}
 </body>
 

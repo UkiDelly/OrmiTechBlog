@@ -8,10 +8,39 @@
     <title>{{ blog.title }} | {{ blog.author }}</title>
 </head>
 <body>
+{% if blog.author == request.user %}
+    <a href="{% url 'blog:blog_update' blog.pk %}">수정하기</a>
+    <a href="#">삭제하기</a>
+{% endif %}
+<a href="#"></a>
+
+<img src="{{ blog.thumbnail.url }}" alt="썸네일">
 <h1>{{ blog.title }}</h1>
 <p>{{ blog.content|safe }}</p>
+<p>{{ blog.likes.count }}</p>
 <p>by {{ blog.author.nickname }}</p>
 
-<p> {{ comments }} </p>
+<form action="{% url 'blog:comment_new' blog.id %}" method="post">
+    {% csrf_token %}
+    {{ comment_form.content }}
+    {{ comment_form.author.as_hidden }}
+    {{ comment_form.parent_comment.as_hidden }}
+    {{ comment_form.blog.as_hidden }}
+    <input type="submit" value="댓글 작성">
+</form>
+
+{% for comment in comments %}
+    <p>{{ comment }}</p>
+    <p>{{ comment.author }}</p>
+    {% if comment.author == request.user %}
+        <a href="#">수정하기</a>
+        <a href="#">삭제하기</a>
+    {% endif %}
+
+    {#    <p>{{ comment.content }}</p>#}
+    {#    <p>{{ comment. }}</p>#}
+{% endfor %}
+
+
 </body>
 </html>
