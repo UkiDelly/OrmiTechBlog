@@ -15,7 +15,7 @@ from django.views.generic import (
 
 from blog.forms import BlogForm
 from blog.models import Blog, Category
-from comments.forms import CommentForm
+from comments.forms import CommentForm, ReCommentForm
 
 
 class BlogListView(ListView):
@@ -53,15 +53,15 @@ class BlogDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs["pk"]
 
-        form = CommentForm(
-            initial={"author": self.request.user, "parent_comment": None, "blog": pk}
-        )
+        form = CommentForm(initial={"author": self.request.user, "blog": pk})
+        reply_form = ReCommentForm(initial={"author": self.request.user})
         blog: Blog | None = get_object_or_404(Blog, pk=pk)
         comments = blog.comment_set.all().order_by("-created_at")
         context["request"] = self.request
         context["blog"] = blog
         context["comments"] = comments
         context["comment_form"] = form
+        context["reply_form"] = reply_form
         return context
 
 
