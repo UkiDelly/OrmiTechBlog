@@ -40,94 +40,248 @@
     {{ comment_form.parent_comment.as_hidden }}
     {{ comment_form.author.as_hidden }}
     <input
-
-            id="create-comment"
-            onclick="onCreateComment()"
+            onclick="addComment()"
             type="button"
             value="댓글 등록"
     />
 </form>
 
 <div id="comment">
-    {% for comment in comments %}
-        <div id="comment{{ comment.id }}">
-            <p>{{ comment.content }}</p>
-            <p>{{ comment.author }}</p>
-            {% if comment.author == request.user.nickname %}
-                <a href="#">수정하기</a>
-                <p><a href="#">삭제하기</a></p>
-            {% endif %}
-        </div>
-    {% endfor %}
 </div>
+
+
+
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ reply_form }}
+</form>
 </body>
 {% block jquery %}
-    <script defer>
-        let comments = [];
+<script>
+    class Comment {
 
-        function getCsrfToken() {
-            return document.cookie.replace('csrftoken=', '');
+            constructor(json) {
+                this.id = json['id']
+                this.blog = json['blog']
+                this.content = json['content']
+                this.author = json['author']
+                this.created_at = json['created_at']
+                this.updated_at = json['updated_at']
 
-        }
-
-        function getComments() {
-            $.ajax({
-                url: "http://127.0.0.1:8000{% url 'blog:blog_detail' blog.pk %}comment/",
-                method: 'GET',
-                success: function (data) {
-                    comments = data;
-                    console.log(comments);
-                    // renderComments(comments);
-                },
-            });
-        }
-
-        function renderComments(comments) {
-            const container = $('#comment');
-            let html = '';
-            for (let comment of comments) {
-                const div = document.createElement('div');
-                div.id = `comment${comment.id}`;
-                let commentHTML = '';
-                commentHTML += `<p>${comment.content}</p>`;
-                commentHTML += `<p>${comment.author}</p>`;
-
-                if (comment.author === '{{ request.user.nickname }}') {
-                    commentHTML += `<a href="#" onclick=newComment() >수정하기</a>`;
-                    commentHTML += `<p><a href="#">삭제하기</a></p>`;
+                let replyList = []
+                for (let reply of json['reply']) {
+                    replyList.push(new Recomment(reply))
                 }
-
-                div.innerHTML = commentHTML;
-                // add the div to the container inner html
-                container.append(div);
+                this.reply = replyList
             }
         }
 
-        function onCreateComment(parentId) {
-            const $content = document.getElementById('id_content')
-            const $blog = document.getElementById('id_blog')
-            const $parent_comment = document.getElementById('id_parent_comment')
-            const $author = document.getElementById('id_author')
-            const $button = document.getElementById('create-comment')
-            console.log(`content: ${$content.value}, blog: ${$blog.value}, parent_comment: ${$parent_comment.value}, author: ${$author.value}, csrfToken: ${getCsrfToken()}`);
+        class Recomment {
+            constructor(json) {
+                this.id = json['id']
+                this.content = json['content']
+                this.author = json['author']
+                this.parent_comment = json['parent_comment']
+                this.created_at = json['created_at']
+                this.updated_at = json['updated_at']
+            }
+        }
+</script>
+<script>
+    async function getToken() {
+        const res = await fetch('http://localhost:8000/accounts/token')
+        const data = await res.json()
+        return data['token']
+    }
+    async function addComment() {
+        const token = await getToken()
 
-            let queryString = `content=${$content.value}&blog=${$blog.value}&parent_comment=${$parent_comment.value}&author=${$author.value}&csrfmiddlewaretoken=${getCsrfToken()}`;
-            $button.onsubmit = async function () {
-                let res = await fetch(`http://127.0.0.1:8000{% url 'blog:comments:add_comment' blog.pk %}?${queryString}`, {
-                    method: 'POST',
-                })
+        {% if request.user.is_authenticated %}
+        const $comment = document.getElementById('id_content')
+        const $blog = document.getElementById('id_blog')
+        const $id_author = document.getElementById('id_author')
 
-                let json = await res.json()
-                console.log(json)
-            };
-            document.getElementById('comment-form').submit();
+        const body = {
+            'content': $comment.value,
+            'blog': $blog.value,
+            'author': $id_author.value
+        }
 
+        const res = await fetch(`http://localhost:8000{% url 'blog:comments:add_comment' blog.pk%}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': "application/json", 'X-CSRFToken': token },
+                body: JSON.stringify(body),
+            },
+        )
+        if (res.status === 200) {
+            const data = await res.json()
+            const commentList = await getComment()
+        } else if (res.status === 404) {
+            alert('삭제된 글입니다.')
+        } else {
+            alert('오류가 발생했습니다.')
+        }
+        {% else %}
+        alert('로그인이 필요한 기능입니다.')
+        {% endif %}
+    }
+</script>
+<script>
+
+    async function addReply() {
+        
+    }
+</script>
+<script>
+
+    function transferCommentToInput(commentId, reply=false){
+
+        const $comment = document.getElementById(`comment${commentId}`)
+        const $content = $comment.getElementsByClassName('content')[0].innerText
+        const $replies = $comment.getElementsByClassName('reply')
+        const replyList = []
+        for (let reply of $replies){
+            replyList.push(reply)
+        }
+
+        console.log($replies);
+
+        const $input = document.createElement('input')
+        $input.setAttribute('name', 'content')
+        $input.setAttribute('value', $content)
+
+        const $button = document.createElement('button')
+        $button.innerText = '수정하기'
+        $button.setAttribute('type', 'button')
+        $button.setAttribute('onclick', `editComment(${commentId}, ${reply})`)
+        // $button.addEventListener('onclick',editComment(commentId, reply)
+        // )
+
+        $comment.innerHTML = ''
+        $comment.appendChild($input)
+        $comment.appendChild($button)
+
+        
+        for (let reply of replyList){
+            console.log(reply);
+            $comment.appendChild(reply)
+        }
+    }
+
+    async function editComment(commentId, reply){
+        console.log(commentId);
+
+        if (reply){
+            // TODO: 댓글 수정 API 개발 및 적용
+            console.log("It is a reply!");
+        } else {
+            // TODO: 대댓글 수정 API 개발 및 적용
+            console.log("It is not a reply!");
+        }
+        await getComment()
+    }
+</script>
+<script >
+    
+    let author = '{{request.user}}'
+    console.log(author);
+    async function getComment() {
+        const res = await fetch(`http://localhost:8000{% url 'blog:comments:comment_list' blog.pk%}`)
+        const data = await res.json()
+        const commentList = []
+
+        for (let i=0; i<data.length; i++){
+            commentList.push(new Comment(data[i]))
+        }
+
+        renderComment(commentList)
+    }
+
+    /**
+     * @param comments {Array<Comment>} 
+    */
+    function renderComment(comments) {
+        let $comment = document.getElementById("comment")
+        $comment.innerHTML = ''
+        
+        for (let comment of comments){
+            let $container = document.createElement('div')
+            $container.id = `comment${comment.id}`
+
+            if (comment.author === author){
+                let $editButton = document.createElement('p')
+                $editButton.innerText = '수정하기'
+                // $editButton.addEventListener('click', transferCommentToInput(comment.id))
+                $editButton.setAttribute('onclick', `transferCommentToInput(${comment.id})`)
+
+                let $deleteButton = document.createElement('p')
+                $deleteButton.innerText = '삭제하기'
+                // $deleteButton.addEventListener('click', transferCommentToInput(comment.id))
+                $container.appendChild($editButton)
+                $container.appendChild($deleteButton)
+            }
+
+            let $content = document.createElement('p')
+            $content.className = 'content'
+            $content.innerText = comment.content
+            $container.appendChild($content)
+
+            let $author = document.createElement('p')
+            $author.className = 'author'
+            $author.innerText = comment.author
+            $container.appendChild($author)
+
+            for (let reply of comment.reply){
+                let $replyContainer = document.createElement('div')
+                $replyContainer.className = 'reply'
+                $replyContainer.id = `reply${reply.id}`
+                $replyContainer.style.paddingLeft = '20px'
+
+                if (reply.author === author){
+                    let $editButton = document.createElement('p')
+                    $editButton.innerText = '수정하기'
+                    // $editButton.addEventListener('click', transferCommentToInput(reply.id))
+                    $editButton.setAttribute('onclick', `transferCommentToInput(${reply.id},true)`)
+
+                    let $deleteButton = document.createElement('p')
+                    $deleteButton.innerText = '삭제하기'
+                    // $editButton.addEventListener('click', transferCommentToInput(reply.id))
+                    $replyContainer.appendChild($editButton)
+                    $replyContainer.appendChild($deleteButton)
+                }
+
+                let $replyContent = document.createElement('p')
+                $replyContent.className = 'content'
+                $replyContent.innerText = reply.content
+                $replyContainer.appendChild($replyContent)
+
+                let $replyAuthor = document.createElement('p')
+                $replyAuthor.className = 'author'
+                $replyAuthor.innerText = reply.author
+                $replyContainer.appendChild($replyAuthor)
+
+                $container.appendChild($replyContainer)
+            }
+
+            $comment.appendChild($container)
 
         }
 
-        window.onload = function () {
-        }
-    </script>
+    }
 
+    
+    window.onload = async function() {
+        await getComment()
+    }
+</script>
 {% endblock %}
 </html>
+
+
+/blog/1/comment/add/?csrfmiddlewaretoken=csrftoken=b3pt1sFRgWQwVzkvH4ARj9HHZjlCclQp&content=12312312&blog=1&author=1
+HTTP/1.1" 403 2531
+
+/blog/1/comment/add/?csrfmiddlewaretoken=csrftoken=b3pt1sFRgWQwVzkvH4ARj9HHZjlCclQp&content=123sdfas&blog=1&author=1
+HTTP/1.1" 403 2531
