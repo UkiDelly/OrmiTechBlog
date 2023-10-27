@@ -20,7 +20,7 @@ class UserLoginView(LoginView):
 
 
 class UserLogoutView(LogoutView):
-    next_page = reverse_lazy("/")
+    next_page = reverse_lazy("blog:blog_list")
 
 
 def get_token(request: HttpRequest):
