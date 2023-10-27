@@ -45,21 +45,6 @@ class Blog(BaseDateTime):
         }
 
 
-class Comment(BaseDateTime):
-    content = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=False)
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
-    parent_comment = models.ForeignKey(
-        "self", on_delete=models.CASCADE, null=True, blank=True
-    )
-
-    class Meta:
-        db_table = "comment"
-
-    def __str__(self):
-        return self.content
-
-
 class Category(models.Model):
     name = models.CharField(max_length=100)
 

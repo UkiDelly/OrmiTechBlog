@@ -70,7 +70,7 @@ class User(AbstractBaseUser):
     ]
 
     def __str__(self):
-        return self.name
+        return self.nickname
 
     def has_perm(self, perm, obj=None):
         return True
@@ -81,3 +81,12 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+
+    def toJson(self):
+        return {
+            "name": self.name,
+            "email": self.email,
+            "nickname": self.nickname,
+            "description": self.description,
+            "profile_image": self.profile_image,
+        }

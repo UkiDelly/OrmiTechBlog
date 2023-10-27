@@ -1,5 +1,8 @@
 # Create your views here.
 from django.contrib.auth.views import LoginView, LogoutView
+from django.http import HttpRequest, JsonResponse
+from django.middleware import csrf
+from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
 from accounts.forms import UserCreationForm
@@ -17,4 +20,9 @@ class UserLoginView(LoginView):
 
 
 class UserLogoutView(LogoutView):
-    next_page = "/"
+    next_page = reverse_lazy("/")
+
+
+def get_token(request: HttpRequest):
+    token = csrf.get_token(request)
+    return JsonResponse({"token": token}, status=200)

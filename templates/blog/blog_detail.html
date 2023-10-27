@@ -1,46 +1,133 @@
-<!doctype html>
+{% load static %}
+<!DOCTYPE html>
 <html lang="ko-KR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8"/>
+    <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>{{ blog.title }} | {{ blog.author }}</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </head>
+
 <body>
 {% if blog.author == request.user %}
     <a href="{% url 'blog:blog_update' blog.pk %}">수정하기</a>
-    <a href="#">삭제하기</a>
-{% endif %}
-<a href="#"></a>
+    <a href="{% url 'blog:blog_delete' blog.pk %}">삭제하기</a>
+{% endif %} {% for category in blog.categorys.all %}
+    <p>{{ category }}</p>
+{% endfor %}
 
-<img src="{{ blog.thumbnail.url }}" alt="썸네일">
+<img width="100px" , height="100px" src="{{ blog.thumbnail.url }}" alt="썸네일"/>
 <h1>{{ blog.title }}</h1>
 <p>{{ blog.content|safe }}</p>
 <p>{{ blog.likes.count }}</p>
 <p>by {{ blog.author.nickname }}</p>
 
-<form action="{% url 'blog:comment_new' blog.id %}" method="post">
+<form
+        id="comment-form"
+
+        action="http://localhost:8000{% url 'blog:comments:add_comment' blog.pk %}"
+        method="post"
+        enctype="multipart/form-data"
+>
     {% csrf_token %}
     {{ comment_form.content }}
-    {{ comment_form.author.as_hidden }}
-    {{ comment_form.parent_comment.as_hidden }}
     {{ comment_form.blog.as_hidden }}
-    <input type="submit" value="댓글 작성">
+    {{ comment_form.parent_comment.as_hidden }}
+    {{ comment_form.author.as_hidden }}
+    <input
+
+            id="create-comment"
+            onclick="onCreateComment()"
+            type="button"
+            value="댓글 등록"
+    />
 </form>
 
-{% for comment in comments %}
-    <p>{{ comment }}</p>
-    <p>{{ comment.author }}</p>
-    {% if comment.author == request.user %}
-        <a href="#">수정하기</a>
-        <a href="#">삭제하기</a>
-    {% endif %}
-
-    {#    <p>{{ comment.content }}</p>#}
-    {#    <p>{{ comment. }}</p>#}
-{% endfor %}
-
-
+<div id="comment">
+    {% for comment in comments %}
+        <div id="comment{{ comment.id }}">
+            <p>{{ comment.content }}</p>
+            <p>{{ comment.author }}</p>
+            {% if comment.author == request.user.nickname %}
+                <a href="#">수정하기</a>
+                <p><a href="#">삭제하기</a></p>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
 </body>
+{% block jquery %}
+    <script defer>
+        let comments = [];
+
+        function getCsrfToken() {
+            return document.cookie.replace('csrftoken=', '');
+
+        }
+
+        function getComments() {
+            $.ajax({
+                url: "http://127.0.0.1:8000{% url 'blog:blog_detail' blog.pk %}comment/",
+                method: 'GET',
+                success: function (data) {
+                    comments = data;
+                    console.log(comments);
+                    // renderComments(comments);
+                },
+            });
+        }
+
+        function renderComments(comments) {
+            const container = $('#comment');
+            let html = '';
+            for (let comment of comments) {
+                const div = document.createElement('div');
+                div.id = `comment${comment.id}`;
+                let commentHTML = '';
+                commentHTML += `<p>${comment.content}</p>`;
+                commentHTML += `<p>${comment.author}</p>`;
+
+                if (comment.author === '{{ request.user.nickname }}') {
+                    commentHTML += `<a href="#" onclick=newComment() >수정하기</a>`;
+                    commentHTML += `<p><a href="#">삭제하기</a></p>`;
+                }
+
+                div.innerHTML = commentHTML;
+                // add the div to the container inner html
+                container.append(div);
+            }
+        }
+
+        function onCreateComment(parentId) {
+            const $content = document.getElementById('id_content')
+            const $blog = document.getElementById('id_blog')
+            const $parent_comment = document.getElementById('id_parent_comment')
+            const $author = document.getElementById('id_author')
+            const $button = document.getElementById('create-comment')
+            console.log(`content: ${$content.value}, blog: ${$blog.value}, parent_comment: ${$parent_comment.value}, author: ${$author.value}, csrfToken: ${getCsrfToken()}`);
+
+            let queryString = `content=${$content.value}&blog=${$blog.value}&parent_comment=${$parent_comment.value}&author=${$author.value}&csrfmiddlewaretoken=${getCsrfToken()}`;
+            $button.onsubmit = async function () {
+                let res = await fetch(`http://127.0.0.1:8000{% url 'blog:comments:add_comment' blog.pk %}?${queryString}`, {
+                    method: 'POST',
+                })
+
+                let json = await res.json()
+                console.log(json)
+            };
+            document.getElementById('comment-form').submit();
+
+
+        }
+
+        window.onload = function () {
+        }
+    </script>
+
+{% endblock %}
 </html>

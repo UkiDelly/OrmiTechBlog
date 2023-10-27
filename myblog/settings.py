@@ -43,14 +43,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "ckeditor",
     "ckeditor_uploader",
     "accounts",
+    "comments",
     "blog",
     "storages",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -132,6 +135,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -145,6 +149,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 CKEDITOR_UPLOAD_PATH = MEDIA_ROOT
 CKEDITOR_IMAGE_BACKEND = "pillow"
+
+CORS_ORIGIN_ALLOW_ALL = True
+CSRF_TRUSTED_ORIGINS = ["http://*/*", "https://*/*"]
 
 # AWS Setting
 AWS_REGION: Final[str] = "ap-northeast-2"

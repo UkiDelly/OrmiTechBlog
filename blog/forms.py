@@ -1,10 +1,11 @@
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django import forms
 
-from blog.models import Blog, Comment, Category
+from blog.models import Blog, Category
 
 
 class BlogForm(forms.ModelForm):
+    thumbnail = forms.ImageField()
     content = forms.CharField(widget=CKEditorUploadingWidget())
 
     class Meta:
@@ -12,14 +13,6 @@ class BlogForm(forms.ModelForm):
         fields = ["title", "thumbnail", "content", "categorys"]
 
     # add the current user to the model
-
-
-class CommentForm(forms.ModelForm):
-    content = forms.CharField()
-
-    class Meta:
-        model = Comment
-        fields = "__all__"
 
 
 class CategoryForm(forms.ModelForm):

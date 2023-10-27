@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from blog.forms import BlogForm, CommentForm, CategoryForm
-from blog.models import Blog, Comment, Category
+from blog.forms import BlogForm, CategoryForm
+from blog.models import Blog, Category
 
 
 # Register your models here.
@@ -21,13 +21,6 @@ class BlogAdmin(admin.ModelAdmin):
         "categorys",
     ]
     readonly_fields = ["created_at", "updated_at"]
-
-
-@admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
-    form = CommentForm
-    list_display = ["content", "author", "created_at"]
-    fields = ["content", "author", "parent_comment", "blog"]
 
 
 @admin.register(Category)
