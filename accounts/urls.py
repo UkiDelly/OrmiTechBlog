@@ -6,11 +6,13 @@ from accounts.views import (
     get_token,
     UserLogoutView,
     UserInfoView,
+    UserInfoUpdateView,
 )
 
 app_name = "accounts"
 urlpatterns = [
-    path("myinfo/<int:pk>/", UserInfoView.as_view(), name="my_info"),
+    path("myinfo/", UserInfoView.as_view(), name="my_info"),
+    path("myinfo/update/", UserInfoUpdateView.as_view(), name="my_info_update"),
     path("signup/", UserRegisterView.as_view(), name="signup"),
     path("login/", UserLoginView.as_view(), name="login"),
     path("logout/", UserLogoutView.as_view(), name="logout"),

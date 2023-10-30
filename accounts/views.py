@@ -4,9 +4,9 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpRequest, JsonResponse
 from django.middleware import csrf
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, UpdateView, TemplateView
 
-from accounts.forms import UserCreationForm
+from accounts.forms import UserCreationForm, UserChangeForm
 from accounts.models import User
 
 
@@ -25,14 +25,24 @@ class UserLogoutView(LogoutView):
     next_page = reverse_lazy("blog:blog_list")
 
 
-class UserInfoView(LoginRequiredMixin, DetailView):
+class UserInfoView(LoginRequiredMixin, TemplateView):
     model = User
     template_name = "accounts/my_info.html"
 
     def get_context_data(self, **kwargs):
-        user = self.get_object()
+        user = User.objects.get(pk=self.request.user.pk)
         context = {"user": user.toJson()}
         return context
+
+
+class UserInfoUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = UserChangeForm
+    success_url = reverse_lazy("accounts:my_info")
+    template_name = "accounts/user_change_form.html"
+
+    def get_object(self, **kwargs):
+        return User.objects.get(pk=self.request.user.pk)
 
 
 def get_token(request: HttpRequest):
