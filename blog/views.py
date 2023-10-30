@@ -1,3 +1,4 @@
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import (
@@ -13,9 +14,10 @@ from django.views.generic import (
     DeleteView,
 )
 
-from .forms import BlogForm
-from .models import Blog, Category
-from .comments.forms import CommentForm
+from comments.forms import CommentForm, ReCommentForm
+
+from blog.forms import BlogForm
+from blog.models import Blog, Category
 
 
 class BlogListView(ListView):
@@ -103,6 +105,9 @@ class MyBlogView(LoginRequiredMixin, ListView):
     context_object_name = "blogs"
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = Blog.objects.filter(
+        user_blog = Blog.objects.filter(
             author=self.request.user).order_by("-created_at")
+        
+        context = { "blogs": [post.to_json() for post in user_blog] }
+        
         return context

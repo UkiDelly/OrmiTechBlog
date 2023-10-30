@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>{{ request.user.nickname }}</title>
-</head>
-<body>
-
-</body>
+  </head>
+  <body>
+    {% for post in blogs %}{{post}}{% endfor %}
+  </body>
 </html>

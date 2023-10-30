@@ -7,14 +7,15 @@ from blog.models import BaseDateTime, Blog
 # Create your models here.
 class Comment(BaseDateTime):
     content = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=False)
+    author = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=False)
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "comment"
 
     def __str__(self):
-        return self.content
+        return f'{self.content}'
 
     def toJson(self):
         return {
@@ -30,14 +31,16 @@ class Comment(BaseDateTime):
 
 class ReComment(BaseDateTime):
     content = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=False)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="reply")
+    author = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=False)
+    comment = models.ForeignKey(
+        Comment, on_delete=models.CASCADE, related_name="reply")
 
     class Meta:
         db_table = "recomment"
 
     def __str__(self):
-        return self.content
+        return f'{self.content}'
 
     def toJson(self):
         return {
