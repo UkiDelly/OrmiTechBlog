@@ -88,5 +88,5 @@ class User(AbstractBaseUser):
             "email": self.email,
             "nickname": self.nickname,
             "description": self.description,
-            "profile_image": self.profile_image,
+            "profile_image": self.profile_image.url if self.profile_image else None,
         }
