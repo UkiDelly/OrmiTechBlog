@@ -13,9 +13,9 @@ from django.views.generic import (
     DeleteView,
 )
 
-from blog.forms import BlogForm
-from blog.models import Blog, Category
-from comments.forms import CommentForm, ReCommentForm
+from .forms import BlogForm
+from .models import Blog, Category
+from .comments.forms import CommentForm
 
 
 class BlogListView(ListView):
@@ -95,3 +95,14 @@ class BlogDeleteView(LoginRequiredMixin, DeleteView):
     model = Blog
     template_name = "blog/blog_delete.html"
     success_url = reverse_lazy("blog:blog_list")
+
+
+class MyBlogView(LoginRequiredMixin, ListView):
+    model = Blog
+    template_name = "blog/my_blog.html"
+    context_object_name = "blogs"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = Blog.objects.filter(
+            author=self.request.user).order_by("-created_at")
+        return context
