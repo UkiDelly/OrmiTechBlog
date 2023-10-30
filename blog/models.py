@@ -34,16 +34,6 @@ class Blog(BaseDateTime):
     def __str__(self):
         return self.title
 
-    def toJson(self):
-        return {
-            "title": self.title,
-            "content": self.content,
-            "author": self.author.username,
-            "view_count": self.view_count,
-            "likes": [like.username for like in self.likes.all()],
-            "tags": [tag.name for tag in self.tags.all()],
-        }
-
 
 class Category(models.Model):
     name = models.CharField(max_length=100)

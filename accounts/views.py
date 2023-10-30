@@ -5,7 +5,7 @@ from django.middleware import csrf
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
-from accounts.forms import UserCreationForm
+from .forms import UserCreationForm
 
 
 class UserRegisterView(CreateView):
