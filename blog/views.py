@@ -1,3 +1,4 @@
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import (
@@ -13,9 +14,10 @@ from django.views.generic import (
     DeleteView,
 )
 
+from comments.forms import CommentForm, ReCommentForm
+
 from blog.forms import BlogForm
 from blog.models import Blog, Category
-from comments.forms import CommentForm
 
 
 class BlogListView(ListView):
@@ -53,15 +55,15 @@ class BlogDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs["pk"]
 
-        form = CommentForm(
-            initial={"author": self.request.user, "parent_comment": None, "blog": pk}
-        )
+        form = CommentForm(initial={"author": self.request.user, "blog": pk})
+        reply_form = ReCommentForm(initial={"author": self.request.user})
         blog: Blog | None = get_object_or_404(Blog, pk=pk)
         comments = blog.comment_set.all().order_by("-created_at")
         context["request"] = self.request
         context["blog"] = blog
         context["comments"] = comments
         context["comment_form"] = form
+        context["reply_form"] = reply_form
         return context
 
 
@@ -95,3 +97,17 @@ class BlogDeleteView(LoginRequiredMixin, DeleteView):
     model = Blog
     template_name = "blog/blog_delete.html"
     success_url = reverse_lazy("blog:blog_list")
+
+
+class MyBlogView(LoginRequiredMixin, ListView):
+    model = Blog
+    template_name = "blog/my_blog.html"
+    context_object_name = "blogs"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        user_blog = Blog.objects.filter(
+            author=self.request.user).order_by("-created_at")
+        
+        context = { "blogs": [post.to_json() for post in user_blog] }
+        
+        return context

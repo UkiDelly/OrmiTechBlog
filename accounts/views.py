@@ -5,7 +5,7 @@ from django.middleware import csrf
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
-from accounts.forms import UserCreationForm
+from .forms import UserCreationForm
 
 
 class UserRegisterView(CreateView):
@@ -20,7 +20,7 @@ class UserLoginView(LoginView):
 
 
 class UserLogoutView(LogoutView):
-    next_page = reverse_lazy("/")
+    next_page = reverse_lazy("blog:blog_list")
 
 
 def get_token(request: HttpRequest):

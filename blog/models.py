@@ -33,15 +33,19 @@ class Blog(BaseDateTime):
 
     def __str__(self):
         return self.title
-
-    def toJson(self):
+    
+    def to_json(self):
         return {
+            "id": self.pk,
             "title": self.title,
+            "thumbnail": self.thumbnail,
             "content": self.content,
-            "author": self.author.username,
+            "author": self.author.nickname,
             "view_count": self.view_count,
-            "likes": [like.username for like in self.likes.all()],
-            "tags": [tag.name for tag in self.tags.all()],
+            "likes": self.likes.count(),
+            "categorys": [category.name for category in self.categorys.all()],
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
         }
 
 
