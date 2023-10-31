@@ -6,8 +6,8 @@ app_name = "comments"
 urlpatterns = [
     path("", CommentListView.as_view(), name="comment_list"),
     path("add/", CommentView.as_view(), name="add_comment"),
-    path("update/<int:pk>/", CommentView.as_view(), name="edit_comment"),
-    path("delete/<int:pk>/", CommentView.as_view(), name="delete_comment"),
+    path("<int:comment_pk>/", CommentView.as_view(), name="edit_comment"),
+    path("<int:comment_pk>/", CommentView.as_view(), name="delete_comment"),
     path(
         "<int:comment_pk>/reply/",
         ReplyCommentView.as_view(),

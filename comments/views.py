@@ -5,7 +5,6 @@ from django.http import HttpRequest, JsonResponse, HttpResponseNotFound
 from django.views import View
 
 from blog.models import Blog
-from comments.forms import CommentForm
 from comments.models import Comment, ReComment
 
 
@@ -21,14 +20,7 @@ class CommentListView(View):
 
 
 class CommentView(LoginRequiredMixin, View):
-    http_method_names = ["get", "post", "put", "delete"]
-
-    def get(self, request: HttpRequest, **kwargs):
-        comment = Comment.objects.get(pk=kwargs["comment_pk"])
-        if comment is None:
-            return HttpResponseNotFound()
-        comment_form = CommentForm(instance=comment)
-        return JsonResponse(comment_form, status=200, safe=False)
+    http_method_names = ["post", "put", "delete"]
 
     def post(self, request: HttpRequest, **kwargs):
         body: dict = json.loads(request.body)
@@ -46,7 +38,7 @@ class CommentView(LoginRequiredMixin, View):
 
     def put(self, request: HttpRequest, **kwargs):
         body: dict = json.loads(request.body)
-        comment = Comment.objects.get(pk=kwargs["pk"])
+        comment = Comment.objects.get(pk=kwargs["comment_pk"])
 
         if comment is None:
             return HttpResponseNotFound()
@@ -55,7 +47,7 @@ class CommentView(LoginRequiredMixin, View):
         return JsonResponse(comment.toJson(), status=200)
 
     def delete(self, request: HttpRequest, **kwargs):
-        comment = Comment.objects.get(pk=kwargs["pk"])
+        comment = Comment.objects.get(pk=kwargs["comment_pk"])
         if comment is None:
             return HttpResponseNotFound()
         comment.delete()
@@ -68,17 +60,18 @@ class ReplyCommentView(LoginRequiredMixin, View):
     def post(self, request: HttpRequest, **kwargs):
         print(kwargs)
         print(json.loads(request.body))
-        return JsonResponse(True, status=200, safe=False)
-        # parent_comment_id = kwargs.get("pk")
-        # body: dict = json.loads(request.body)
-        # ReComment.objects.create(
-        #     content=body.get("content"),
-        #     author=request.user,
-        #     comment=Comment.objects.get(pk=parent_comment_id),
-        # )
-        #
-        # if parent_comment_id is None:
-        #     return HttpResponseNotFound()
+        parent_comment_id = kwargs.get("comment_pk")
+
+        if parent_comment_id is None:
+            return HttpResponseNotFound()
+
+        content = json.loads(request.body).get("content")
+        comment = ReComment.objects.create(
+            content=content,
+            author=request.user,
+            comment=Comment.objects.get(pk=parent_comment_id),
+        )
+        return JsonResponse(comment.toJson(), status=200)
 
     def put(self, request: HttpRequest, **kwargs):
         pk = kwargs.get("reply_pk")
@@ -93,8 +86,12 @@ class ReplyCommentView(LoginRequiredMixin, View):
 
     def delete(self, request: HttpRequest, **kwargs):
         print(kwargs)
-        # pk = kwargs.get("pk")
-        # comment = ReComment.objects.get(pk=pk)
+        pk = kwargs.get("reply_pk")
+        comment = ReComment.objects.get(pk=pk)
+        if comment is None:
+            return HttpResponseNotFound()
+        comment.delete()
+        return JsonResponse(True, status=200, safe=False)
         #
         # if comment:
         #     comment.delete()
