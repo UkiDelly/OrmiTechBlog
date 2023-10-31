@@ -29,8 +29,9 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'accounts:my_info' %}">내 정보</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url "blog:my_blog" %}">내 블로그 가기</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">로그아웃</a></li>
-                    <li class="nav-item active"><p class="nav-link text-decoration-underline"
-                                                   style="margin-bottom: 0">{{ request.user.nickname }}</p>
+                    <li class="nav-item active">
+                        <p class="nav-link text-decoration-underline"
+                           style="margin-bottom: 0">{{ request.user.nickname }}</p>
                     </li>
                 {% else %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">로그인</a></li>
@@ -53,7 +54,7 @@
 <!-- Core theme JS-->
 <script src="{% static 'js/scripts.js' %}"></script>
 {% block js %}
-	
+
 {% endblock %}
 </body>
 </html>

@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import (
     HttpResponseBadRequest,
@@ -38,14 +39,15 @@ class BlogListView(ListView):
             query_set = Blog.objects.filter(Q(title__icontains=q))
         elif category:
             query_set = Blog.objects.filter(categorys__name=category)
-        if page:
-            query_set = Blog.objects.get_queryset().paginate(page=page, per_page=10)
 
         return query_set.order_by("-created_at")
 
     def get_context_data(self, **kwargs):
-        total = self.get_queryset().count()
         context = super().get_context_data(**kwargs)
+        page = self.request.GET.get("page")
+        paginator = Paginator(context.get("blogs"), 6)
+        context["blogs"] = paginator.get_page(page)
+        context["most_like"] = Blog.objects.order_by('-likes').first()
         context["categorys"] = Category.objects.all()
         return context
 
