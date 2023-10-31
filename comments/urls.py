@@ -1,9 +1,17 @@
 from django.urls import path
 
-from comments.views import comment_list, AddComment
+from comments.views import CommentListView, CommentView, ReplyCommentView
 
 app_name = "comments"
 urlpatterns = [
-    path("", comment_list, name="comment_list"),
-    path("add/", AddComment.as_view(), name="add_comment"),
+    path("", CommentListView.as_view(), name="comment_list"),
+    path("add/", CommentView.as_view(), name="add_comment"),
+    path("update/<int:pk>/", CommentView.as_view(), name="edit_comment"),
+    path("delete/<int:pk>/", CommentView.as_view(), name="delete_comment"),
+    path(
+        "<int:comment_pk>/reply/",
+        ReplyCommentView.as_view(),
+        name="add_reply_comment",
+    ),
+    path("reply/<int:reply_pk>/", ReplyCommentView.as_view(), name="reply_comment"),
 ]
