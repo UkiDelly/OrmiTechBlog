@@ -12,30 +12,29 @@
 
 {% block body %}
     <h1>Blog</h1>
-
-
     <form action="" method="get">
         <label>
             <input type="text" name="q">
         </label>
         <input type="submit" value="search">
     </form>
-
-
+    <div>
+        total : {{ blogs.count }}
+    </div>
     <a href="{% url 'blog:blog_list' %}">전체</a>
     {% for category in categorys.all %}
-        <a href="{% url 'blog:blog_list' %}?q={{ category.name }}">{{ category.name }}</a>
+        <a href="{% url 'blog:blog_list' %}?category={{ category.name }}">{{ category.name }}</a>
     {% endfor %}
-
-
     {% for blog in blogs %}
-        <img width="100px" height="100px" src="{{ blog.thumbnail.url }}" alt="썸네일">
-        <h2>
-            <a href="{% url 'blog:blog_detail' blog.pk %}">{{ blog.title }}</a></h2>
-        <p>{{ blog.author }}</p>
-        {% for category in blog.categorys.all %}
-            <p>{{ category }}</p>
-        {% endfor %}
+        <div>
+            <img width="100px" height="100px" src="{{ blog.thumbnail.url }}" alt="썸네일">
+            <h2>
+                <a href="{% url 'blog:blog_detail' blog.pk %}">{{ blog.title }}</a></h2>
+            <p>{{ blog.author }}</p>
+            {% for category in blog.categorys.all %}
+                <p>{{ category }}</p>
+                </div>
+            {% endfor %}
 
 
 
@@ -43,9 +42,7 @@
     {% endfor %}
 {% endblock %}
 </body>
-
 <script>
-
 </script>
 </html>
 

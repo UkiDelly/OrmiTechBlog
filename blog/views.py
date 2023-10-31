@@ -1,4 +1,3 @@
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import (
@@ -14,10 +13,9 @@ from django.views.generic import (
     DeleteView,
 )
 
-from comments.forms import CommentForm, ReCommentForm
-
 from blog.forms import BlogForm
 from blog.models import Blog, Category
+from comments.forms import CommentForm, ReCommentForm
 
 
 class BlogListView(ListView):
@@ -31,17 +29,22 @@ class BlogListView(ListView):
 
         # reqeust의 GET 파라미터에서 'q'를 가져옵니다.
         q = self.request.GET.get("q")
-
+        # 페이지 네이션
+        page = self.request.GET.get("page")
+        #
+        category = self.request.GET.get("category")
         # 'q' 파라미터가 제공되었을 경우, 쿼리셋을 필터링한다.
         if q:
-            query_set = query_set.filter(
-                Q(title__icontains=q)
-                | Q(content__icontains=q)
-                | Q(categorys__name__icontains=q)
-            )
-        return query_set
+            query_set = Blog.objects.filter(Q(title__icontains=q))
+        elif category:
+            query_set = Blog.objects.filter(categorys__name=category)
+        if page:
+            query_set = Blog.objects.get_queryset().paginate(page=page, per_page=10)
+
+        return query_set.order_by("-created_at")
 
     def get_context_data(self, **kwargs):
+        total = self.get_queryset().count()
         context = super().get_context_data(**kwargs)
         context["categorys"] = Category.objects.all()
         return context
@@ -59,7 +62,6 @@ class BlogDetailView(DetailView):
         reply_form = ReCommentForm(initial={"author": self.request.user})
         blog: Blog | None = get_object_or_404(Blog, pk=pk)
         comments = blog.comment_set.all().order_by("-created_at")
-        context["request"] = self.request
         context["blog"] = blog
         context["comments"] = comments
         context["comment_form"] = form
@@ -105,9 +107,8 @@ class MyBlogView(LoginRequiredMixin, ListView):
     context_object_name = "blogs"
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        user_blog = Blog.objects.filter(
-            author=self.request.user).order_by("-created_at")
-        
-        context = { "blogs": [post.to_json() for post in user_blog] }
-        
+        user_blog = Blog.objects.filter(author=self.request.user).order_by(
+            "-created_at"
+        )
+        context = {"blogs": [post.to_json() for post in user_blog]}
         return context
