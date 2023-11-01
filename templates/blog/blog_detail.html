@@ -17,50 +17,99 @@
 </head>
 
 <body>
-{% block body %} {% if blog.author == request.user %}
-    <div>
-        <a href="{% url 'blog:blog_update' blog.pk %}">수정하기</a>
-        <a href="{% url 'blog:blog_delete' blog.pk %}">삭제하기</a>
+{% block body %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class=col-lg-8>
+                <article>
+                    {# 수정하기, 삭제하기 #}
+                    {% if blog.author == request.user %}
+                        <div>
+                        <a class="text-muted fst-italic" href="{% url 'blog:blog_update' blog.pk %}">수정하기</a>
+                        <a class="text-muted fst-italic" href="{% url 'blog:blog_delete' blog.pk %}">삭제하기</a>
+                    {% endif %}
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">{{ blog.title }}</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">{{ blog.created_at }}
+                            by {{ blog.author.nickname }}</div>
+
+                        <!-- Post categories-->
+                        {% for category in blog.categorys.all %}
+                            <a class="badge bg-secondary text-decoration-none link-light"
+                               href="#!">{{ category.name }}</a>
+                        {% endfor %}
+                    </header>
+
+                    </div>
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="{{ blog.thumbnail.url }}"
+                             style="display: block; margin: 0 auto; width:900px; height:400px;"
+                             alt="..."/>
+                    </figure>
+
+                    <section id="content-section" class="mb-5">
+                        {{ blog.content|safe }}
+
+                    </section>
+
+                    <p>{{ blog.likes.count }}</p>
+
+
+                </article>
+                <section class="mb-5 ">
+
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <form
+                                    id="comment-form"
+                                    class=" d-flex flex-column"
+                                    action=" http:
+                            //localhost:8000{% url 'blog:comments:add_comment' blog.pk %}"
+                                    method="post"
+                                    enctype="multipart/form-data"
+                            >
+                                {% csrf_token %}
+                                {{ comment_form.content }}
+                                {{ comment_form.blog.as_hidden }}
+                                {{ comment_form.parent_comment.as_hidden }}
+                                {{ comment_form.author.as_hidden }}
+                                <input class="mt-2 btn btn-primary" style="width: 20%; align-self: end"
+                                       onclick="addComment()" type="button"
+                                       value="댓글 등록"/>
+                            </form>
+                            <div id="comment" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+
+                </section>
+            </div>
+        </div>
     </div>
-{% endif %} {% for category in blog.categorys.all %}
-    <p>{{ category }}</p>
-{% endfor %}
-
-    <img
-            width="100px"
-            height="100px"
-            src="{{ blog.thumbnail.url }}"
-            alt="썸네일"
-    />
-    <h1>{{ blog.title }}</h1>
-    <p>{{ blog.content|safe }}</p>
-    <p>{{ blog.likes.count }}</p>
-    <p>by {{ blog.author.nickname }}</p>
-
-    <form
-            id="comment-form"
-            action="http://localhost:8000{% url 'blog:comments:add_comment' blog.pk %}"
-            method="post"
-            enctype="multipart/form-data"
-    >
-        {% csrf_token %}
-        {{ comment_form.content }}
-        {{ comment_form.blog.as_hidden }}
-        {{ comment_form.parent_comment.as_hidden }}
-        {{ comment_form.author.as_hidden }}
-        <input onclick="addComment()" type="button" value="댓글 등록"/>
-    </form>
-
-    <div id="comment"></div>
-
     {# 클래스 선언부 #}
     <script>
+
+        class Author {
+            constructor(json) {
+                this.id = json['pk']
+                this.name = json['name']
+                this.nickname = json['nickname']
+                this.email = json['email']
+                this.description = json['description']
+                this.profile_image = json['profile_image']
+            }
+
+        }
+
         class Comment {
             constructor(json) {
                 this.id = json['id'];
                 this.blog = json['blog'];
                 this.content = json['content'];
-                this.author = json['author'];
+
+                this.author = new Author(json['author']);
                 this.created_at = json['created_at'];
                 this.updated_at = json['updated_at'];
 
@@ -76,7 +125,7 @@
             constructor(json) {
                 this.id = json['id'];
                 this.content = json['content'];
-                this.author = json['author'];
+                this.author = new Author(json['author']);
                 this.parent_comment = json['parent_comment'];
                 this.created_at = json['created_at'];
                 this.updated_at = json['updated_at'];
@@ -92,9 +141,10 @@
         }
 
         async function addComment() {
-            const token = await getToken()
+
 
             {% if request.user.is_authenticated %}
+                const token = await getToken()
                 const $comment = document.getElementById('id_content')
                 const $blog = document.getElementById('id_blog')
                 const $id_author = document.getElementById('id_author')
@@ -110,8 +160,14 @@
                         method: 'POST',
                         headers: {'Content-Type': "application/json", 'X-CSRFToken': token},
                         body: JSON.stringify(body),
+                        redirect: 'follow'
                     },
                 )
+
+                if (res.redirected) {
+                    window.location.href = res.url
+                }
+
                 if (res.status === 200) {
                     const data = await res.json()
                     const commentList = await getComment()
@@ -132,14 +188,16 @@
 
             console.log("답글 달기를 클릭하였습니다!")
             const $replyForm = document.createElement('div')
-            $replyForm.className = 'reply-form'
+            $replyForm.classList.add('reply-form', 'd-flex', 'flex-column', 'pt-4')
 
-            const $input = document.createElement('input')
+            const $input = document.createElement('textarea')
+            $input.className = 'form-control'
             $input.setAttribute('name', 'content')
             $input.setAttribute('type', 'text')
 
             const $button = document.createElement('button')
             $button.innerText = '답글달기'
+            $button.classList.add('btn', 'btn-primary', 'mt-2', 'align-self-end')
             $button.setAttribute('type', 'button')
             $button.setAttribute(
                 'onclick',
@@ -159,7 +217,7 @@
         async function addReply(commentId) {
 
             const $comment = document.getElementById(`comment${commentId}`)
-            const content = $comment.getElementsByTagName('input')[0].value
+            const content = $comment.getElementsByTagName('textarea')[0].value
 
             let token = await getToken()
             let res = await fetch(`http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}/reply/`, {
@@ -183,52 +241,30 @@
         ) {
             if (reply) {
                 const $reply = document.getElementById(`reply${commentId}`);
-                const $content =
-                    $reply.getElementsByClassName('content')[0].innerText;
-                const $input = document.createElement('input');
-                $input.setAttribute('name', 'content');
-                $input.setAttribute('value', $content);
-
-                const $button = document.createElement('button');
-                $button.innerText = '수정하기';
-                $button.setAttribute('type', 'button');
-                $button.setAttribute(
-                    'onclick',
-                    `editComment(${commentId}, ${reply})`,
-                );
-
-                $reply.innerHTML = '';
-                $reply.appendChild($input);
-                $reply.appendChild($button);
+                const content =
+                    document.querySelector(`#reply${commentId}-content`).innerText;
+                $reply.innerHTML = `<div class="container d-flex flex-column mt-4" >
+<textarea class="form-control" name='content'>${content}</textarea>
+<button class="btn btn-primary mt-2 align-self-end" onclick="editComment(${commentId},${reply})">수정하기</button>
+</div>`;
             } else {
                 const $comment = document.getElementById(`comment${commentId}`);
-                const $content =
-                    $comment.getElementsByClassName('content')[0].innerText;
-                const $replies = $comment.getElementsByClassName('reply');
+                const content =
+                    document.querySelector(`#comment${commentId}-content`).innerText;
+
+                const $replies = $comment.getElementsByClassName('replies');
                 const replyList = [];
                 for (let reply of $replies) {
                     replyList.push(reply);
                 }
-
-                const $input = document.createElement('input');
-                $input.setAttribute('name', 'content');
-                $input.setAttribute('value', $content);
-
-                const $button = document.createElement('button');
-                $button.innerText = '수정하기';
-                $button.setAttribute('type', 'button');
-                $button.setAttribute(
-                    'onclick',
-                    `editComment(${commentId}, ${reply})`,
-                );
-                // $button.addEventListener('onclick',editComment(commentId, reply)
-                // )
-
+                const $container = `<div class="container d-flex flex-column mt-4" >
+<textarea class="form-control" name='content'>${content}</textarea>
+<button class="btn btn-primary mt-2 align-self-end" onclick="editComment(${commentId},${reply})">수정하기</button>
+</div>`
                 $comment.innerHTML = '';
-                $comment.appendChild($input);
-                $comment.appendChild($button);
-
+                $comment.innerHTML = $container
                 for (let reply of replyList) {
+                    reply.style.marginLeft = '50px';
                     console.log(reply);
                     $comment.appendChild(reply);
                 }
@@ -239,7 +275,7 @@
             if (reply) {
                 const content = document
                     .getElementById(`reply${commentId}`)
-                    .getElementsByTagName('input')[0];
+                    .getElementsByTagName('textarea')[0];
                 console.log(content.value);
                 await fetch(
                     `http://localhost:8000/blog/{{ blog.pk }}/comment/reply/${commentId}/`,
@@ -255,7 +291,7 @@
             } else {
                 const content = document
                     .getElementById(`comment${commentId}`)
-                    .getElementsByTagName('input')[0];
+                    .getElementsByTagName('textarea')[0];
                 console.log(content.value);
                 await fetch(
                     `http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}/`,
@@ -276,7 +312,6 @@
     <script>
         async function deleteComment(commentId, reply = false) {
             const confirm = window.confirm('댓글을 삭제하시겠습니까?');
-
             if (confirm) {
                 let url = '';
                 if (reply) {
@@ -301,8 +336,7 @@
     </script>
     {# 댓글 가져오기 #}
     <script>
-        let author = '{{request.user}}';
-        console.log(author);
+        let author = '{{request.user.nickname}}';
 
         async function getComment() {
             const res = await fetch(
@@ -328,112 +362,93 @@
             for (let comment of comments) {
                 let $container = document.createElement('div');
                 $container.id = `comment${comment.id}`;
-                $container.className = 'comment-container'
-
-                if (comment.author === author) {
-                    const $buttonContainer = document.createElement('div');
-                    $buttonContainer.className = 'button-container';
-                    $buttonContainer.style.display = 'flex';
-
-                    const $addReplyButton = document.createElement('p');
-                    $addReplyButton.className = 'reply-button';
-                    $addReplyButton.innerText = '답글달기';
-                    $addReplyButton.style.textDecoration = 'underline';
-                    $addReplyButton.setAttribute(
-                        'onclick',
-                        `createReplyInput(${comment.id})`,
-                    );
-
-                    let $editButton = document.createElement('p');
-                    $editButton.innerText = '수정하기';
-                    $editButton.style.textDecoration = 'underline';
-                    // $editButton.addEventListener('click', transferCommentToInput(comment.id))
-                    $editButton.setAttribute(
-                        'onclick',
-                        `transferCommentToInput(${comment.id})`,
-                    );
-
-                    let $deleteButton = document.createElement('p');
-                    $deleteButton.innerText = '삭제하기';
-                    $deleteButton.style.textDecoration = 'underline';
-                    // $deleteButton.addEventListener('click', transferCommentToInput(comment.id))
-                    $deleteButton.setAttribute(
-                        'onclick',
-                        `deleteComment(${comment.id})`,
-                    );
-
-                    $buttonContainer.appendChild($addReplyButton);
-                    $buttonContainer.appendChild($editButton);
-                    $buttonContainer.appendChild($deleteButton);
-                    $container.appendChild($buttonContainer);
-                }
-
-                let $content = document.createElement('p');
-                $content.className = 'content';
-                $content.innerText = comment.content;
-                $container.appendChild($content);
-
-                let $author = document.createElement('p');
-                $author.className = 'author';
-                $author.innerText = comment.author;
-                $container.appendChild($author);
-
-                const $replies = document.createElement('div');
-                $replies.className = 'replies';
+                $container.classList.add('comment-container')
+                $container.classList.add('mb-4')
+                $container.classList.add('d-flex')
+                $container.classList.add('flex-column')
 
 
-                for (let reply of comment.reply) {
-                    let $replyContainer = document.createElement('div');
-                    $replyContainer.className = 'reply';
-                    $replyContainer.id = `reply${reply.id}`;
-                    $replyContainer.style.paddingLeft = '20px';
+                {% if request.user.is_authenticated %}
+                    let buttons = `<div class="button-container d-flex"  style="align-self: flex-start" >
+<p class="text-muted fst-italic reply-button text-decoration-underline px-2" onclick="createReplyInput(${comment.id})">답글달기</p>`
+                    if (comment.author.nickname === author) {
+                        buttons += `<p class="text-muted fst-italic  text-decoration-underline px-2" onclick="transferCommentToInput(${comment.id})">수정하기</p>
+<p class="text-muted fst-italic  text-decoration-underline px-2" onclick="deleteComment(${comment.id})">삭제하기</p>`
+                    }
+                    buttons += `</div>`
+                    $container.innerHTML += buttons
+                {% endif %}
 
-                    if (reply.author === author) {
-                        const $buttonContainer = document.createElement('div');
-                        $buttonContainer.style.display = 'flex';
-                        $buttonContainer.className = 'button-container';
+                let content = ``
+                if (comment.reply.length === 0) {
+                    content = `<div class="d-flex" style="width: 100%">
+                    <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                    <div id="comment${comment.id}-content"  class="ms-3">
+                        <div id="comment${comment.id}-author" class="fw-bold">${comment.author.nickname}</div>
+                        ${comment.content}
+                    </div>
+                </div>`
+                } else {
+                    let replies = ``
+                    for (let reply of comment.reply) {
+                        let replyContent = `<div id='reply${reply.id}'>`
+                        {% if request.user.is_authenticated %}
+                            let buttons = `<div class="button-container justify-content-end align-content-end" style="display: flex; width: 100%">`
 
-
-                        let $editButton = document.createElement('p');
-                        $editButton.innerText = '수정하기';
-                        $editButton.style.textDecoration = 'underline';
-                        // $editButton.addEventListener('click', transferCommentToInput(reply.id))
-                        $editButton.setAttribute(
-                            'onclick',
-                            `transferCommentToInput(${reply.id},true)`,
-                        );
-
-                        let $deleteButton = document.createElement('p');
-                        $deleteButton.innerText = '삭제하기';
-                        $deleteButton.style.textDecoration = 'underline';
-                        $deleteButton.setAttribute(
-                            'onclick',
-                            `deleteComment(${comment.id},true)`,
-                        );
-
-                        $buttonContainer.appendChild($editButton);
-                        $buttonContainer.appendChild($deleteButton);
-                        $replyContainer.appendChild($buttonContainer);
+                            if (reply.author.nickname === author) {
+                                buttons += `<p class="text-muted fst-italic  text-decoration-underline px-2" onclick="transferCommentToInput(${reply.id},true)">수정하기</p>`
+                                buttons += `<p class="text-muted fst-italic  text-decoration-underline px-2" onclick="deleteComment(${reply.id},true)">삭제하기</p>`
+                            }
+                            buttons += `</div>`
+                            replyContent += buttons
+                        {% endif %}
+                        replyContent += `<!-- Child comment 1-->
+                                        <div  class="d-flex mb-4">
+                                            <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                            <div  class="ms-3">
+                                                <div id="reply${reply.id}-author" class="fw-bold">${reply.author.nickname}</div>
+                                                <p id="reply${reply.id}-content">${reply.content}</p>
+                                            </div>
+                                        </div>`
+                        replyContent += `</div>`
+                        replies += replyContent
                     }
 
-                    let $replyContent = document.createElement('p');
-                    $replyContent.className = 'content';
-                    $replyContent.innerText = reply.content;
-                    $replyContainer.appendChild($replyContent);
 
-                    let $replyAuthor = document.createElement('p');
-                    $replyAuthor.className = 'author';
-                    $replyAuthor.innerText = reply.author;
-                    $replyContainer.appendChild($replyAuthor);
-
-                    $replies.appendChild($replyContainer);
+                    content = `<div class="d-flex mb-2">
+                                    <!-- Parent comment-->
+                                    <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
+                                    <div  class="ms-3">
+                                        <div class="fw-bold">${comment.author.nickname}</div>
+                                        <p id='comment${comment.id}-content'>${comment.content}</p>
+                                        <div class="replies mt-4">${replies}</div>
+                                </div>`
                 }
-                $container.appendChild($replies);
+
+
+                $container.innerHTML += content
                 $comment.appendChild($container);
             }
         }
 
         window.onload = async function () {
+            const $contentSection = document.getElementById('content-section');
+            const $pContenst = $contentSection.getElementsByTagName('p')
+            for (let i = 0; i < $pContenst.length; i++) {
+                $pContenst[i].className = 'fs-5 mb-4'
+            }
+
+            const $commentInput = document.getElementById('id_content')
+            $commentInput.className = 'form-control'
+
+            const $contentImg = document.getElementById('content-section').getElementsByTagName('img')
+
+            for (let i = 0; i < $contentImg.length; i++) {
+                $contentImg[i].classList.add('position-relative')
+                $contentImg[i].style.maxWidth = '100%'
+            }
+
+
             await getComment();
         };
     </script>

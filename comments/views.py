@@ -92,8 +92,3 @@ class ReplyCommentView(LoginRequiredMixin, View):
             return HttpResponseNotFound()
         comment.delete()
         return JsonResponse(True, status=200, safe=False)
-        #
-        # if comment:
-        #     comment.delete()
-        #     return JsonResponse(True, status=200, safe=False)
-        # return HttpResponseNotFound()

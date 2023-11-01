@@ -4,7 +4,7 @@ from comments.models import Comment, ReComment
 
 
 class CommentForm(forms.ModelForm):
-    content = forms.CharField()
+    content = forms.Textarea()
 
     class Meta:
         model = Comment
