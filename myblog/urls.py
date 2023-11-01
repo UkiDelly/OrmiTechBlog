@@ -8,7 +8,7 @@ from myblog import settings
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("ckeditor/", include("ckeditor_uploader.urls")),
-    path("", RedirectView.as_view(url="/blog?page=1")),
+    path("", RedirectView.as_view(url="/blog/")),
     path("accounts/", include("accounts.urls")),
     path("blog/", include("blog.urls")),
 ]

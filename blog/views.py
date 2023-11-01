@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import (
-    HttpResponseBadRequest,
+    HttpResponseBadRequest, HttpRequest,
 )
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -11,7 +11,7 @@ from django.views.generic import (
     CreateView,
     DetailView,
     UpdateView,
-    DeleteView,
+    DeleteView, TemplateView,
 )
 
 from blog.forms import BlogForm
@@ -50,6 +50,26 @@ class BlogListView(ListView):
         context["most_like"] = Blog.objects.order_by('-likes').first()
         context["categorys"] = Category.objects.all()
         return context
+
+
+class BlogSearchView(TemplateView):
+    http_method_names = ["get"]
+    template_name = "blog/search.html"
+
+    def get(self, request: HttpRequest, **kwargs):
+        query = self.request.GET.get("q")
+        context = {'query': query}
+        blog_list = Blog.objects.filter(Q(title__icontains=query) | Q(content__in=query))
+        context["blogs"] = blog_list
+
+        if not query:
+            context["blogs"] = []
+        return self.render_to_response(context)
+
+
+class CategorySearchView(TemplateView):
+    template_name = "blog/category_search.html"
+    http_method_names = ["get"]
 
 
 class BlogDetailView(DetailView):

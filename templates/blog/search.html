@@ -1,0 +1,76 @@
+{% extends 'blog/index.html' %}
+{% load static %}
+<!doctype html>
+<html lang="ko-Kr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% block title %}
+        <title>{{ query }} | 검색</title>
+    {% endblock %}
+</head>
+<body>
+
+{% block body %}
+    {#검색바#}
+    <div class="container justify-content-center h-100 py-4" style="width: 60%; ">
+        <div class="input-group" style="height: 60px; align-self: center">
+            <input class="form-control search-input" type="text" placeholder="검색어를 입력하세요.."
+                   aria-label="Enter search term..." aria-describedby="button-search"/>
+            <button class="btn btn-primary" id="button-search" type="button"
+                    onclick="searchBlog()">
+                검색하기
+            </button>
+        </div>
+    </div>
+    <div class="container pt-4 px-sm-5 px-md-40 ">
+        {% for blog in blogs %}
+            <div class="card mb-4 ">
+                <a class="overflow-hidden" style="height: 350px" href="{% url 'blog:blog_detail' blog.pk %}">
+                    <img
+                            class="card-img-top"
+                            src="http://localhost:8000{{ blog.thumbnail.url }}"
+                            alt="..."/>
+                </a>
+                <div class="card-body">
+                    <div class="small text-muted">{{ blog.created_at }}</div>
+                    <h2 class="card-title h4">{{ blog.title }}</h2>
+                    <p class="card-text">{{ blog.content|striptags|truncatechars:200 }}</p>
+                    <a class="btn btn-primary" href="{% url 'blog:blog_detail' blog.pk %}">더보기 →</a>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+
+
+    <script>
+
+        window.onload = function () {
+            const $searchInput = document.querySelector('.search-input');
+            const $searchButton = document.querySelector('#button-search');
+            const $container = document.querySelector('.container');
+            $searchInput.value = '{{ query }}'
+        }
+
+        async function searchBlog() {
+
+            const $searchInput = document.getElementsByClassName("search-input")[0];
+
+            const searchValue = $searchInput.value;
+            const res = await fetch(`http://localhost:8000/blog/search?q=${searchValue}`, {
+                method: "GET",
+                redirect: "follow"
+            });
+
+            if (res.redirected) {
+                window.location.href = res.url;
+            }
+        }
+
+    </script>
+{% endblock %}
+</body>
+</html>

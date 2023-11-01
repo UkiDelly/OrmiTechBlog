@@ -1,4 +1,5 @@
 {% extends 'blog/index.html' %}
+{% load static %}
 <!doctype html>
 <html lang="ko-KR">
 <head>
@@ -14,6 +15,7 @@
 
     <!-- Page content-->
     <div class="container pt-4">
+        <p class="h3">좋아요를 가장 많이 받은 포스트</p>
         <div class="row">
             <!-- Blog entries-->
             <div class="col-lg-8">
@@ -36,58 +38,103 @@
                 {% endif %}
                 <!-- Nested row for non-featured blog posts-->
                 <div class="row">
-                    <div class="col-lg-6">
-                        <!-- Blog post-->
-                        <div class="card mb-4">
-                            <a href="#!"><img class="card-img-top"
-                                              src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..."/></a>
-                            <div class="card-body">
-                                <div class="small text-muted">January 1, 2023</div>
-                                <h2 class="card-title h4">Post Title</h2>
-                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Reiciendis aliquid atque, nulla.</p>
-                                <a class="btn btn-primary" href="#!">Read more →</a>
+
+                    {% for blog in blogs %}
+                        {% if blog.pk|divisibleby:2 %}
+                            <div class="col-lg-6">
+                                <div class="card mb-4">
+                                    <a class="overflow-hidden" style="max-height: 350px"
+                                       href="{% url 'blog:blog_detail' blog.pk %}">
+                                        <img
+                                                height="350px"
+                                                class="card-img-top"
+                                                src="http://localhost:8000{{ blog.thumbnail.url }}"
+                                                alt="..."/>
+                                    </a>
+                                    <div class="card-body">
+                                        <div class="small text-muted">{{ blog.created_at }}</div>
+                                        <h2 class="card-title h4">{{ blog.title }}</h2>
+                                        <p class="card-text">{{ blog.content|striptags|truncatechars:100 }}</p>
+                                        <a class="btn btn-primary" href="{% url 'blog:blog_detail' blog.pk %}">더보기 →</a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <!-- Blog post-->
-                        <div class="card mb-4">
-                            <a href="#!"><img class="card-img-top"
-                                              src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..."/></a>
-                            <div class="card-body">
-                                <div class="small text-muted">January 1, 2023</div>
-                                <h2 class="card-title h4">Post Title</h2>
-                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Reiciendis aliquid atque, nulla.</p>
-                                <a class="btn btn-primary" href="#!">Read more →</a>
+                        {% else %}
+                            <div class="col-lg-6">
+                                <div class="card mb-4">
+                                    <a class="overflow-hidden" style="max-height: 350px"
+                                       href="{% url 'blog:blog_detail' blog.pk %}">
+                                        <img
+                                                class="card-img-top"
+                                                src="http://localhost:8000{{ blog.thumbnail.url }}"
+                                                alt="..."/>
+                                    </a>
+                                    <div class="card-body">
+                                        <div class="small text-muted">{{ blog.created_at }}</div>
+                                        <h2 class="card-title h4">{{ blog.title }}</h2>
+                                        <p class="card-text">{{ blog.content|striptags|truncatechars:100 }}</p>
+                                        <a class="btn btn-primary" href="{% url 'blog:blog_detail' blog.pk %}">더보기 →</a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <!-- Blog post-->
-                        <div class="card mb-4">
-                            <a href="#!"><img class="card-img-top"
-                                              src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..."/></a>
-                            <div class="card-body">
-                                <div class="small text-muted">January 1, 2023</div>
-                                <h2 class="card-title h4">Post Title</h2>
-                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Reiciendis aliquid atque, nulla.</p>
-                                <a class="btn btn-primary" href="#!">Read more →</a>
-                            </div>
-                        </div>
-                        <!-- Blog post-->
-                        <div class="card mb-4">
-                            <a href="#!"><img class="card-img-top"
-                                              src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..."/></a>
-                            <div class="card-body">
-                                <div class="small text-muted">January 1, 2023</div>
-                                <h2 class="card-title h4">Post Title</h2>
-                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Reiciendis aliquid atque, nulla? Quos cum ex quis soluta, a laboriosam.</p>
-                                <a class="btn btn-primary" href="#!">Read more →</a>
-                            </div>
-                        </div>
-                    </div>
+                        {% endif %}
+                    {% endfor %}
+
+
+                    {#                    <div class="col-lg-6">#}
+                    {#                        <!-- Blog post-->#}
+                    {##}
+                    {##}
+                    {#                        <div class="card mb-4">#}
+                    {#                            <a href="#!"><img class="card-img-top"#}
+                    {#                                              src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..."/></a>#}
+                    {#                            <div class="card-body">#}
+                    {#                                <div class="small text-muted">January 1, 2023</div>#}
+                    {#                                <h2 class="card-title h4">Post Title</h2>#}
+                    {#                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit.#}
+                    {#                                    Reiciendis aliquid atque, nulla.</p>#}
+                    {#                                <a class="btn btn-primary" href="#!">Read more →</a>#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                        <!-- Blog post-->#}
+                    {#                        <div class="card mb-4">#}
+                    {#                            <a href="#!"><img class="card-img-top"#}
+                    {#                                              src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..."/></a>#}
+                    {#                            <div class="card-body">#}
+                    {#                                <div class="small text-muted">January 1, 2023</div>#}
+                    {#                                <h2 class="card-title h4">Post Title</h2>#}
+                    {#                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit.#}
+                    {#                                    Reiciendis aliquid atque, nulla.</p>#}
+                    {#                                <a class="btn btn-primary" href="#!">Read more →</a>#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                    </div>#}
+                    {#                    <div class="col-lg-6">#}
+                    {#                        <!-- Blog post-->#}
+                    {#                        <div class="card mb-4">#}
+                    {#                            <a href="#!"><img class="card-img-top"#}
+                    {#                                              src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..."/></a>#}
+                    {#                            <div class="card-body">#}
+                    {#                                <div class="small text-muted">January 1, 2023</div>#}
+                    {#                                <h2 class="card-title h4">Post Title</h2>#}
+                    {#                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit.#}
+                    {#                                    Reiciendis aliquid atque, nulla.</p>#}
+                    {#                                <a class="btn btn-primary" href="#!">Read more →</a>#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                        <!-- Blog post-->#}
+                    {#                        <div class="card mb-4">#}
+                    {#                            <a href="#!"><img class="card-img-top"#}
+                    {#                                              src="https://dummyimage.com/700x350/dee2e6/6c757d.jpg" alt="..."/></a>#}
+                    {#                            <div class="card-body">#}
+                    {#                                <div class="small text-muted">January 1, 2023</div>#}
+                    {#                                <h2 class="card-title h4">Post Title</h2>#}
+                    {#                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit.#}
+                    {#                                    Reiciendis aliquid atque, nulla? Quos cum ex quis soluta, a laboriosam.</p>#}
+                    {#                                <a class="btn btn-primary" href="#!">Read more →</a>#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                    </div>#}
                 </div>
                 <!-- Pagination-->
                 <nav aria-label="Pagination">
@@ -115,12 +162,15 @@
             <div class="col-lg-4">
                 <!-- Search widget-->
                 <div class="card mb-4">
-                    <div class="card-header">Search</div>
+                    <div class="card-header">게시글 검색하기</div>
                     <div class="card-body">
                         <div class="input-group">
-                            <input class="form-control" type="text" placeholder="Enter search term..."
-                                   aria-label="Enter search term..." aria-describedby="button-search"/>
-                            <button class="btn btn-primary" id="button-search" type="button">Go!</button>
+                            <input class="form-control search-input" type="text" placeholder="검색어를 입력하세요..."
+                                   aria-label="검색어를 입력하세요..." aria-describedby="button-search"/>
+                            <button class="btn btn-primary" id="button-search" type="button"
+                                    onclick="searchBlog()">
+                                검색하기
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -196,10 +246,24 @@
     {#            <p>{{ category }}</p>#}
     {#        {% endfor %}#}
     {#    {% endfor %}#}
+    <script>
+        async function searchBlog() {
+
+            const $searchInput = document.getElementsByClassName("search-input")[0];
+
+            const searchValue = $searchInput.value;
+            const res = await fetch(`http://localhost:8000/blog/search?q=${searchValue}`, {
+                method: "GET",
+                redirect: "follow"
+            });
+
+            if (res.redirected) {
+                window.location.href = res.url;
+            }
+        }
+    </script>
 {% endblock %}
 </body>
-<script>
-</script>
 </html>
 
 
