@@ -2,10 +2,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import (
-    HttpResponseBadRequest, HttpRequest,
+    HttpResponseBadRequest, HttpRequest, HttpResponseNotFound,
 )
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import (
     ListView,
     CreateView,
@@ -84,6 +85,8 @@ class BlogDetailView(DetailView):
         reply_form = ReCommentForm(initial={"author": self.request.user})
         blog: Blog | None = get_object_or_404(Blog, pk=pk)
         comments = blog.comment_set.all().order_by("-created_at")
+        blog.view_count += 1
+        blog.save()
         context["blog"] = blog
         context["comments"] = comments
         context["comment_form"] = form
@@ -132,5 +135,22 @@ class MyBlogView(LoginRequiredMixin, ListView):
         user_blog = Blog.objects.filter(author=self.request.user).order_by(
             "-created_at"
         )
+
         context = {"blogs": [post.to_json() for post in user_blog]}
         return context
+
+
+class LikeUnlikeView(LoginRequiredMixin, View):
+    http_method_names = ["post"]
+
+    def post(self, request: HttpRequest, **kwargs):
+
+        blog = Blog.objects.get(pk=kwargs["pk"])
+        if blog is None:
+            return HttpResponseNotFound()
+
+        if blog.likes.contains(self.request.user):
+            blog.likes.remove(self.request.user)
+        else:
+            blog.likes.add(self.request.user)
+        return redirect(reverse_lazy("blog:blog_detail", kwargs={"pk": kwargs["pk"]}))

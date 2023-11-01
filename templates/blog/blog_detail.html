@@ -23,24 +23,28 @@
             <div class=col-lg-8>
                 <article>
                     {# 수정하기, 삭제하기 #}
-                    {% if blog.author == request.user %}
-                        <div>
-                        <a class="text-muted fst-italic" href="{% url 'blog:blog_update' blog.pk %}">수정하기</a>
-                        <a class="text-muted fst-italic" href="{% url 'blog:blog_delete' blog.pk %}">삭제하기</a>
-                    {% endif %}
-                    <header class="mb-4">
-                        <!-- Post title-->
-                        <h1 class="fw-bolder mb-1">{{ blog.title }}</h1>
-                        <!-- Post meta content-->
-                        <div class="text-muted fst-italic mb-2">{{ blog.created_at }}
-                            by {{ blog.author.nickname }}</div>
+                    <div>
+                        {% if blog.author == request.user %}
+                            <div class="container d-flex flex-row justify-content-end">
+                                <a class="text-muted fst-italic mx-2"
+                                   href="{% url 'blog:blog_update' blog.pk %}">수정하기</a>
+                                <a class="text-muted fst-italic mx-2"
+                                   href="{% url 'blog:blog_delete' blog.pk %}">삭제하기</a>
+                            </div>
+                        {% endif %}
+                        <header class="mb-4">
+                            <!-- Post title-->
+                            <h1 class="fw-bolder mb-1">{{ blog.title }}</h1>
+                            <!-- Post meta content-->
+                            <div class="text-muted fst-italic mb-2">{{ blog.created_at }}
+                                by {{ blog.author.nickname }}</div>
 
-                        <!-- Post categories-->
-                        {% for category in blog.categorys.all %}
-                            <a class="badge bg-secondary text-decoration-none link-light"
-                               href="#!">{{ category.name }}</a>
-                        {% endfor %}
-                    </header>
+                            <!-- Post categories-->
+                            {% for category in blog.categorys.all %}
+                                <a class="badge bg-secondary text-decoration-none link-light"
+                                   href="#!">{{ category.name }}</a>
+                            {% endfor %}
+                        </header>
 
                     </div>
                     <figure class="mb-4">
@@ -51,11 +55,7 @@
 
                     <section id="content-section" class="mb-5">
                         {{ blog.content|safe }}
-
                     </section>
-
-                    <p>{{ blog.likes.count }}</p>
-
 
                 </article>
                 <section class="mb-5 ">
@@ -83,8 +83,38 @@
                         </div>
                     </div>
 
-
                 </section>
+            </div>
+            <!-- Side widgets-->
+            <div class="col-lg-4">
+
+                <div class="card mb-4">
+                    <div class="card-header">조회수</div>
+                    <div class="card-body">
+                        <p class=" h1 card-text text-center">
+                            {{ blog.view_count }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Side widget-->
+                <div class="card mb-4 align-items-center p-4" style="width: fit-content; height: fit-content">
+                    {#                    <div class="card-header">좋아요</div>#}
+                    {% if request.user in blog.likes.all %}
+
+                        <img style="width: 50px; height: 50px;" src="{% static 'heartbutton_2.svg' %}"
+                             onclick="likeUnlikeBlog()"
+                             alt="좋아요 버튼"/>
+                    {% else %}
+                        <img style="width: 50px; height: 50px;" src="{% static 'heartbutton_99629.svg' %}"
+                             onclick="likeUnlikeBlog()"
+                             alt="좋아요 버튼"/>
+                    {% endif %}
+                    <p class=" card-text text-center">
+                        좋아요 {{ blog.likes.count }}개
+                    </p>
+                </div>
+
             </div>
         </div>
     </div>
@@ -129,6 +159,22 @@
                 this.parent_comment = json['parent_comment'];
                 this.created_at = json['created_at'];
                 this.updated_at = json['updated_at'];
+            }
+        }
+    </script>
+    {# 좋아요 #}
+    <script>
+        async function likeUnlikeBlog() {
+            const res = await fetch(`http://localhost:8000{% url 'blog:blog_like' pk=blog.pk %}`, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: {
+                    'X-CSRFToken': await getToken()
+                }
+            })
+
+            if (res.redirected) {
+                window.location.href = res.url
             }
         }
     </script>
