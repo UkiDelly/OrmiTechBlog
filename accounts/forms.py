@@ -8,7 +8,7 @@ class UserCreationForm(forms.ModelForm):
     email = forms.EmailField(label="이메일", widget=forms.EmailInput)
     nickname = forms.CharField(label="별명", widget=forms.TextInput)
     username = forms.CharField(label="아이디", widget=forms.TextInput)
-    description = forms.CharField(label="한줄 소개")
+    description = forms.Textarea()
     profile_image = forms.ImageField(widget=forms.FileInput, required=False)
     password1 = forms.CharField(label="비밀번호", widget=forms.PasswordInput)
     password2 = forms.CharField(label="비밀번호 확인", widget=forms.PasswordInput)
@@ -22,7 +22,6 @@ class UserCreationForm(forms.ModelForm):
             "nickname",
             "description",
             "profile_image",
-            "password",
         ]
 
     def clean_password2(self):
