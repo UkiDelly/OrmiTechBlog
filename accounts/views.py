@@ -1,7 +1,7 @@
 # Create your views here.
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, JsonResponse, HttpResponseRedirect
 from django.middleware import csrf
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, TemplateView
@@ -41,8 +41,13 @@ class UserInfoUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("accounts:my_info")
     template_name = "accounts/user_change_form.html"
 
-    def get_object(self, **kwargs):
+    def get_object(self, queryset=None):
         return User.objects.get(pk=self.request.user.pk)
+
+    def form_valid(self, form):
+        if form.is_valid():
+            form.save()
+        return HttpResponseRedirect(self.get_success_url())
 
 
 def get_token(request: HttpRequest):

@@ -1,10 +1,16 @@
+{% extends 'blog/index.html' %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>{{ request.user.nickname }}</title>
-  </head>
-  <body>
-    {% for post in blogs %}{{post}}{% endfor %}
-  </body>
+<head>
+    <meta charset="UTF-8"/>
+    {% block title %}
+        <title>{{ request.user.nickname }}의 블로그</title>
+    {% endblock %}
+</head>
+<body>
+{% block body %}
+    {% for post in blogs %}{{ post }}{% endfor %}
+{% endblock %}
+</body>
 </html>

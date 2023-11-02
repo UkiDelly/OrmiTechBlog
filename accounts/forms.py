@@ -47,7 +47,7 @@ class UserChangeForm(forms.ModelForm):
     email = forms.EmailField(label="이메일", widget=forms.EmailInput)
     nickname = forms.CharField(label="별명", widget=forms.TextInput)
     description = forms.Textarea()
-    profile_image = forms.ImageField(label="프로필 사진")
+    profile_image = forms.ImageField(label="프로필 사진", widget=forms.FileInput, required=False, allow_empty_file=True)
 
     class Meta:
         model = User
@@ -58,10 +58,3 @@ class UserChangeForm(forms.ModelForm):
             "description",
             "profile_image",
         ]
-
-    def save(self, commit=True):
-        user: User = super().save(commit=False)
-        print(user)
-        if commit:
-            user.save()
-        return user

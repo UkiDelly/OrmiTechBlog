@@ -1,3 +1,4 @@
+{% extends 'blog/index.html' %}
 <!doctype html>
 <html lang="ko-KR">
 <head>
@@ -5,20 +6,72 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ request.user.username }}</title>
+    {% block title %}
+        <title>{{ request.user.username }}</title>
+    {% endblock %}
 </head>
 <body>
+{% block body %}
+    <div style="min-height: 1080px">
+        <div class="container mt-4 p-4 d-flex flex-column">
+            <form class="d-flex flex-column" action=""
+                  method="post"
+                  enctype="multipart/form-data"
+            >
+                {% csrf_token %}
 
-<form action="" method="post">
-    {% csrf_token %}
-    <table>
-        {{ form.as_p }}
-    </table>
-    <input type="submit" value="submit">
+                <div class="d-flex flex-column my-2">
+                    <p>이름</p>
+                    {{ form.name }}
+                </div>
 
-</form>
+                <div class="d-flex flex-column my-2">
+                    <p>이메일</p>
+                    {{ form.email }}
+                </div>
 
-<a href="{% url 'accounts:my_info' %}">취소</a>
+                <div class="d-flex flex-column my-2">
+                    <p>별명</p>
+                    {{ form.nickname }}
+                </div>
 
+                <div class="d-flex flex-column my-2">
+                    <p>한줄 소개</p>
+                    {{ form.description }}
+                </div>
+
+                <div id="profile-image-container" class="d-flex flex-column my-2">
+                    <p>프로필 사진</p>
+                    {{ form.profile_image }}
+                </div>
+
+                <input type="submit" value="완료">
+
+            </form>
+
+            <a href="{% url 'accounts:my_info' %}">취소</a>
+        </div>
+
+    </div>
+    <script>
+
+        function setUp() {
+            const $name = document.getElementById('id_name');
+            const $email = document.getElementById('id_email');
+            const $nickname = document.getElementById('id_nickname');
+            const $description = document.getElementById('id_description');
+            const $profile_image = document.getElementById('id_profile_image');
+
+            $name.classList.add("form-control");
+            $email.classList.add("form-control");
+            $nickname.classList.add("form-control");
+            $description.classList.add("form-control");
+            $profile_image.classList.add("form-control");
+        }
+
+        window.onload = setUp
+
+    </script>
+{% endblock %}
 </body>
 </html>
