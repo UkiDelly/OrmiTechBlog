@@ -1,16 +1,18 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import (
-    HttpResponseBadRequest,
+    HttpResponseBadRequest, HttpRequest, HttpResponseNotFound,
 )
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import (
     ListView,
     CreateView,
     DetailView,
     UpdateView,
-    DeleteView,
+    DeleteView, TemplateView,
 )
 
 from blog.forms import BlogForm
@@ -38,16 +40,37 @@ class BlogListView(ListView):
             query_set = Blog.objects.filter(Q(title__icontains=q))
         elif category:
             query_set = Blog.objects.filter(categorys__name=category)
-        if page:
-            query_set = Blog.objects.get_queryset().paginate(page=page, per_page=10)
 
         return query_set.order_by("-created_at")
 
     def get_context_data(self, **kwargs):
-        total = self.get_queryset().count()
         context = super().get_context_data(**kwargs)
+        page = self.request.GET.get("page")
+        paginator = Paginator(context.get("blogs"), 6)
+        context["blogs"] = paginator.get_page(page)
+        context["most_like"] = Blog.objects.order_by('-likes').first()
         context["categorys"] = Category.objects.all()
         return context
+
+
+class BlogSearchView(TemplateView):
+    http_method_names = ["get"]
+    template_name = "blog/search.html"
+
+    def get(self, request: HttpRequest, **kwargs):
+        query = self.request.GET.get("q")
+        context = {'query': query}
+        blog_list = Blog.objects.filter(Q(title__icontains=query) | Q(content__in=query))
+        context["blogs"] = blog_list
+
+        if not query:
+            context["blogs"] = []
+        return self.render_to_response(context)
+
+
+class CategorySearchView(TemplateView):
+    template_name = "blog/category_search.html"
+    http_method_names = ["get"]
 
 
 class BlogDetailView(DetailView):
@@ -62,6 +85,8 @@ class BlogDetailView(DetailView):
         reply_form = ReCommentForm(initial={"author": self.request.user})
         blog: Blog | None = get_object_or_404(Blog, pk=pk)
         comments = blog.comment_set.all().order_by("-created_at")
+        blog.view_count += 1
+        blog.save()
         context["blog"] = blog
         context["comments"] = comments
         context["comment_form"] = form
@@ -88,6 +113,11 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
     model = Blog
     template_name = "blog/blog_form.html"
 
+    def get_context_data(self, **kwargs):
+        blog = self.get_object()
+        context = {"form": BlogForm(instance=blog)}
+        return context
+
     def form_valid(self, form):
         if form.is_valid():
             form.save()
@@ -110,5 +140,22 @@ class MyBlogView(LoginRequiredMixin, ListView):
         user_blog = Blog.objects.filter(author=self.request.user).order_by(
             "-created_at"
         )
+
         context = {"blogs": [post.to_json() for post in user_blog]}
         return context
+
+
+class LikeUnlikeView(LoginRequiredMixin, View):
+    http_method_names = ["post"]
+
+    def post(self, request: HttpRequest, **kwargs):
+
+        blog = Blog.objects.get(pk=kwargs["pk"])
+        if blog is None:
+            return HttpResponseNotFound()
+
+        if blog.likes.contains(self.request.user):
+            blog.likes.remove(self.request.user)
+        else:
+            blog.likes.add(self.request.user)
+        return redirect(reverse_lazy("blog:blog_detail", kwargs={"pk": kwargs["pk"]}))

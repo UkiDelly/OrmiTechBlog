@@ -21,7 +21,7 @@ class Comment(BaseDateTime):
         return {
             "id": self.pk,
             "content": self.content,
-            "author": self.author.nickname,
+            "author": self.author.toJson(),
             "blog": self.blog.pk,
             "reply": [comment.toJson() for comment in self.reply.all()],
             "created_at": self.created_at,
@@ -47,7 +47,7 @@ class ReComment(BaseDateTime):
             "id": self.pk,
             "parent_comment": self.comment.pk,
             "content": self.content,
-            "author": self.author.nickname,
+            "author": self.author.toJson(),
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }

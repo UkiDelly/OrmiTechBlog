@@ -1,3 +1,5 @@
+{% extends "blog/index.html" %}
+{% load static %}
 <!doctype html>
 <html lang="ko-KR">
 <head>
@@ -8,14 +10,67 @@
     <title>블로그 작성하기</title>
 </head>
 <body>
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <table>
-        {{ form.media }}
-        {{ form.as_p }}
-    </table>
-    <input type="submit" value="submit">
-</form>
+{% block body %}
+    <div class="container d-flex flex-column" style="min-height: 1080px; width: 100%">
 
+        <form class="d-flex flex-column" action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="container d-flex flex-column mt-4">
+                {{ form.media }}
+                <p class="h1"> 제목 </p>
+                {{ form.title }}
+
+                <div class="d-flex flex-row mb-4">
+
+                    <div class="d-flex flex-column">
+                        <p class="h3 mb-3">썸네일</p>
+                        {{ form.thumbnail }}
+                    </div>
+
+                    <div class="d-flex flex-column" style="width: 80%">
+                        <p class="h3 mb-3">카테고리</p>
+                        {{ form.categorys }}
+
+                    </div>
+                </div>
+
+                {{ form.content }}
+
+            </div>
+            <input class="btn btn-primary m-4 align-self-end" style="width: 20%; height: 50px" type="submit"
+                   value="등록하기">
+        </form>
+
+    </div>
+
+
+    <script>
+
+        function setup() {
+            const $titleInput = document.getElementById('id_title');
+            const $fileInput = document.getElementById('id_thumbnail');
+            const $categorys = document.getElementById('id_categorys')
+            const $options = document.getElementsByTagName('option')
+
+            $titleInput.classList.add('form-control', 'mb-5', 'mt-2')
+
+
+            $fileInput.classList.add('mb-5', 'custom-file')
+
+            for (let i = 0; i < $options.length; i++) {
+                $options[i].classList.add('py-2')
+            }
+
+            $categorys.classList.add("form-select")
+
+
+        }
+
+        window.onload = function () {
+            setup()
+        }
+
+    </script>
+{% endblock %}
 </body>
 </html>

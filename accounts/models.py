@@ -7,7 +7,7 @@ from django.db import models
 # Create your models here.
 class UserManager(BaseUserManager):
     def create_user(
-        self, name, username, email, password, description, nickname, profile_image=None
+            self, name, username, email, password, description, nickname, profile_image=None
     ):
         if not username:
             raise ValueError("아이디를 입력해주세요")
@@ -84,6 +84,7 @@ class User(AbstractBaseUser):
 
     def toJson(self):
         return {
+            "id": self.pk,
             "name": self.name,
             "email": self.email,
             "nickname": self.nickname,

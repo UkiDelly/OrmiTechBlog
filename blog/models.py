@@ -19,7 +19,7 @@ class Blog(BaseDateTime):
     def get_upload_to(self, filename):
         return f"blog/{self.pk}/{filename}"
 
-    thumbnail = models.ImageField(upload_to=get_upload_to, blank=True, null=True)
+    thumbnail = models.ImageField(upload_to=get_upload_to, blank=True, null=True, )
     content = RichTextUploadingField(blank=True, null=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=False)
     view_count = models.IntegerField(default=0)
@@ -33,7 +33,7 @@ class Blog(BaseDateTime):
 
     def __str__(self):
         return self.title
-    
+
     def to_json(self):
         return {
             "id": self.pk,
