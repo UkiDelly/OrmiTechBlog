@@ -1,0 +1,53 @@
+{% extends 'blog/index.html' %}
+<!doctype html>
+<html lang="ko-KR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% block title %}
+        <title>Blog | {{ category.name }}</title>
+    {% endblock %}
+</head>
+<body>
+{% block body %}
+    <div class="container my-4 py-4 d-flex flex-column align-items-center">
+        <h1 class="d-flex align-self-start px-4 mx-4 mb-4"> # {{ category.name }}</h1>
+
+        <p class="d-flex align-self-start px-4 mx-4 mb-4"> 총 {{ blogs.count }}개의 포스트</p>
+
+        {% for blog in blogs %}
+            <div class="card mb-4" style="width: 750px">
+                <a
+                        class="overflow-hidden"
+                        style="max-height: 350px"
+                        href="{% url 'blog:blog_detail' blog.pk %}"
+                >
+                    <img
+                            width="750px"
+                            height="350px"
+                            class="card-img-top"
+                            src="http://localhost:8000{{ blog.thumbnail.url }}"
+                            alt="..."
+                    />
+                </a>
+                <div class="card-body">
+                    <div class="small text-muted">{{ blog.created_at }}</div>
+                    <h2 class="card-title h4">{{ blog.title }}</h2>
+                    <p class="card-text">
+                        {{ blog.content|striptags|truncatechars:100 }}
+                    </p>
+                    <a
+                            class="btn btn-primary"
+                            href="{% url 'blog:blog_detail' blog.pk %}"
+                    >더보기 →</a
+                    >
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
+</body>
+</html>

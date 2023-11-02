@@ -4,15 +4,16 @@ from django.db.models import Q
 from django.http import (
     HttpResponseBadRequest, HttpRequest, HttpResponseNotFound,
 )
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import (
+    DeleteView,
     ListView,
     CreateView,
     DetailView,
     UpdateView,
-    DeleteView, TemplateView,
+    TemplateView,
 )
 
 from blog.forms import BlogForm
@@ -33,13 +34,9 @@ class BlogListView(ListView):
         q = self.request.GET.get("q")
         # 페이지 네이션
         page = self.request.GET.get("page")
-        #
-        category = self.request.GET.get("category")
-        # 'q' 파라미터가 제공되었을 경우, 쿼리셋을 필터링한다.
+
         if q:
             query_set = Blog.objects.filter(Q(title__icontains=q))
-        elif category:
-            query_set = Blog.objects.filter(categorys__name=category)
 
         return query_set.order_by("-created_at")
 
@@ -60,7 +57,8 @@ class BlogSearchView(TemplateView):
     def get(self, request: HttpRequest, **kwargs):
         query = self.request.GET.get("q")
         context = {'query': query}
-        blog_list = Blog.objects.filter(Q(title__icontains=query) | Q(content__in=query))
+        blog_list = Blog.objects.filter(
+            Q(title__icontains=query) | Q(content__in=query))
         context["blogs"] = blog_list
 
         if not query:
@@ -68,9 +66,13 @@ class BlogSearchView(TemplateView):
         return self.render_to_response(context)
 
 
-class CategorySearchView(TemplateView):
-    template_name = "blog/category_search.html"
-    http_method_names = ["get"]
+def filter_category(request: HttpRequest, c_pk: int):
+    category = get_object_or_404(Category, pk=c_pk)
+    blog_list = Blog.objects.filter(
+        categorys__name__icontains=category.name).order_by("-created_at")
+    context = {"blogs": blog_list}
+    context["category"] = category
+    return render(request, "blog/category_search.html", context)
 
 
 class BlogDetailView(DetailView):
@@ -98,13 +100,15 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
     form_class = BlogForm
     model = Blog
     template_name = "blog/blog_form.html"
-    success_url = reverse_lazy("blog:blog_list")
 
     # catch the form when press submit
     def form_valid(self, form):
         if form.is_valid():
             form.instance.author = self.request.user
             form.save()
+
+            new_blog_pk = form.instance.pk
+            return redirect(reverse_lazy("blog:blog_detail", kwargs={"pk": new_blog_pk}))
         return HttpResponseBadRequest(form.errors)
 
 
