@@ -13,7 +13,7 @@
         <title>Blog</title>
     {% endblock %}
 </head>
-<body style="min-height: 1080px">
+<body>
 
 <!-- Responsive navbar-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -28,13 +28,15 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'blog:blog_create' %}">새 글 작성</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'accounts:my_info' %}">내 정보</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url "blog:my_blog" %}">내 블로그 가기</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">로그아웃</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}?next={{ request.path }}">로그아웃</a>
+                    </li>
                     <li class="nav-item active">
                         <p class="nav-link text-decoration-underline"
                            style="margin-bottom: 0">{{ request.user.nickname }}</p>
                     </li>
                 {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">로그인</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}?next={{ request.path }}">로그인</a>
+                    </li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'accounts:signup' %}">회원 가입</a></li>
                 {% endif %}
             </ul>
@@ -42,8 +44,12 @@
     </div>
 </nav>
 
+
 {% block body %}
 {% endblock %}
+
+</div>
+
 
 <!-- Footer-->
 <footer class="py-5 bg-dark">

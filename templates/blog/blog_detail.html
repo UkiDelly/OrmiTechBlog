@@ -165,17 +165,24 @@
     {# 좋아요 #}
     <script>
         async function likeUnlikeBlog() {
-            const res = await fetch(`http://localhost:8000{% url 'blog:blog_like' pk=blog.pk %}`, {
-                method: 'POST',
-                redirect: 'follow',
-                headers: {
-                    'X-CSRFToken': await getToken()
-                }
-            })
 
-            if (res.redirected) {
-                window.location.href = res.url
-            }
+            {% if request.user.is_authenticated %}
+                const res = await fetch(`http://localhost:8000{% url 'blog:blog_like' pk=blog.pk %}`, {
+                    method: 'POST',
+                    redirect: 'follow',
+                    headers: {
+                        'X-CSRFToken': await getToken()
+                    }
+                })
+
+                if (res.redirected) {
+                    window.location.href = res.url
+                }
+            {% else %}
+                alert('로그인이 필요한 기능입니다.')
+            {% endif %}
+
+
         }
     </script>
     {# 댓글 추가 및 토큰 가져오기#}

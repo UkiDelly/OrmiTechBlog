@@ -18,11 +18,17 @@ class UserRegisterView(CreateView):
 
 class UserLoginView(LoginView):
     template_name = "accounts/user_login_form.html"
-    next_page = "/"
+
+    def get_redirect_url(self):
+        path = self.request.GET.get("next")
+        return path
 
 
 class UserLogoutView(LogoutView):
-    next_page = reverse_lazy("blog:blog_list")
+
+    def get_redirect_url(self):
+        path = self.request.GET.get("next")
+        return path
 
 
 class UserInfoView(LoginRequiredMixin, TemplateView):
