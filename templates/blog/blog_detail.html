@@ -1,476 +1,475 @@
 {% extends 'blog/index.html' %} {% load static %}
 <!DOCTYPE html>
 <html lang="ko-KR">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8"/>
     <meta
-      name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+            name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     {% block title %}
-    <title>{{ blog.title }} | {{ blog.author }}</title>
+        <title>{{ blog.title }} | {{ blog.author }}</title>
     {% endblock %} {% block css %}
-    <link href="{% static 'css/blog_detail.css' %}" rel="stylesheet" />
-    {% endblock %}
-  </head>
+    <link href="{% static 'css/blog_detail.css' %}" rel="stylesheet"/>
+{% endblock %}
+</head>
 
-  <body>
-    {% block body %}
+<body>
+{% block body %}
     <div class="container mt-5">
-      <div class="row">
-        <div class="col-lg-8">
-          <article>
-            {# 수정하기, 삭제하기 #}
-            <div>
-              {% if blog.author == request.user %}
-              <div class="container d-flex flex-row justify-content-end">
-                <a
-                  class="text-muted fst-italic mx-2"
-                  href="{% url 'blog:blog_update' blog.pk %}"
-                  >수정하기</a
-                >
-                <a
-                  id="post-delete"
-                  class="text-muted fst-italic mx-2"
-                  href="{% url 'blog:blog_delete' blog.pk %}"
-                  >삭제하기</a
-                >
-              </div>
-              {% endif %}
-              <header class="mb-4">
-                <!-- Post title-->
-                <h1 class="fw-bolder mb-1">{{ blog.title }}</h1>
-                <!-- Post meta content-->
-                <div class="text-muted fst-italic mb-2">
-                  {{ blog.created_at }} by {{ blog.author.nickname }}
-                </div>
+        <div class="row">
+            <div class="col-lg-8">
+                <article>
+                    {# 수정하기, 삭제하기 #}
+                    <div>
+                        {% if blog.author == request.user %}
+                            <div class="container d-flex flex-row justify-content-end">
+                                <a
+                                        class="text-muted fst-italic mx-2"
+                                        href="{% url 'blog:blog_update' blog.pk %}"
+                                >수정하기</a
+                                >
+                                <a
+                                        id="post-delete"
+                                        class="text-muted fst-italic mx-2"
+                                        href="{% url 'blog:blog_delete' blog.pk %}"
+                                >삭제하기</a
+                                >
+                            </div>
+                        {% endif %}
+                        <header class="mb-4">
+                            <!-- Post title-->
+                            <h1 class="fw-bolder mb-1">{{ blog.title }}</h1>
+                            <!-- Post meta content-->
+                            <div class="text-muted fst-italic mb-2">
+                                {{ blog.created_at }} by {{ blog.author.nickname }}
+                            </div>
 
-                <!-- Post categories-->
-                {% for category in blog.categorys.all %}
-                <a
-                  class="badge bg-secondary text-decoration-none link-light"
-                  href="#!"
-                  >{{ category.name }}</a
-                >
-                {% endfor %}
-              </header>
-            </div>
-            <figure class="mb-4">
-              <img
-                class="img-fluid rounded"
-                src="{{ blog.thumbnail.url }}"
-                style="
+                            <!-- Post categories-->
+                            {% for category in blog.categorys.all %}
+                                <a
+                                        class="badge bg-secondary text-decoration-none link-light"
+                                        href="{% url 'blog:category_search' category.pk %}"
+                                >{{ category.name }}</a
+                                >
+                            {% endfor %}
+                        </header>
+                    </div>
+                    <figure class="mb-4">
+                        <img
+                                class="img-fluid rounded"
+                                src="{{ blog.thumbnail.url }}"
+                                style="
                   display: block;
                   margin: 0 auto;
                   width: 900px;
                   height: 400px;
                 "
-                alt="..."
-              />
-            </figure>
+                                alt="..."
+                        />
+                    </figure>
 
-            <section id="content-section" class="mb-5">
-              {{ blog.content|safe }}
-            </section>
-          </article>
-          <section class="mb-5">
-            <div class="card bg-light">
-              <div class="card-body">
-                <form
-                  id="comment-form"
-                  class="d-flex flex-column"
-                  action=" http:
+                    <section id="content-section" class="mb-5">
+                        {{ blog.content|safe }}
+                    </section>
+                </article>
+                <section class="mb-5">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <form
+                                    id="comment-form"
+                                    class="d-flex flex-column"
+                                    action=" http:
                             //localhost:8000{% url 'blog:comments:add_comment' blog.pk %}"
-                  method="post"
-                  enctype="multipart/form-data"
+                                    method="post"
+                                    enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {{ comment_form.content }}
+                                {{ comment_form.blog.as_hidden }}
+                                {{ comment_form.parent_comment.as_hidden }}
+                                {{ comment_form.author.as_hidden }}
+                                <input
+                                        class="mt-2 btn btn-primary"
+                                        style="width: 20%; align-self: end"
+                                        onclick="addComment()"
+                                        type="button"
+                                        value="댓글 등록"
+                                />
+                            </form>
+                            <div id="comment" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!-- Side widgets-->
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">조회수</div>
+                    <div class="card-body">
+                        <p class="h1 card-text text-center">{{ blog.view_count }}</p>
+                    </div>
+                </div>
+
+                <!-- Side widget-->
+                <div
+                        class="card mb-4 align-items-center p-4"
+                        style="width: fit-content; height: fit-content"
                 >
-                  {% csrf_token %} {{ comment_form.content }} {{
-                  comment_form.blog.as_hidden }} {{
-                  comment_form.parent_comment.as_hidden }} {{
-                  comment_form.author.as_hidden }}
-                  <input
-                    class="mt-2 btn btn-primary"
-                    style="width: 20%; align-self: end"
-                    onclick="addComment()"
-                    type="button"
-                    value="댓글 등록"
-                  />
-                </form>
-                <div id="comment" style="width: 100%"></div>
-              </div>
-            </div>
-          </section>
-        </div>
-        <!-- Side widgets-->
-        <div class="col-lg-4">
-          <div class="card mb-4">
-            <div class="card-header">조회수</div>
-            <div class="card-body">
-              <p class="h1 card-text text-center">{{ blog.view_count }}</p>
-            </div>
-          </div>
 
-          <!-- Side widget-->
-          <div
-            class="card mb-4 align-items-center p-4"
-            style="width: fit-content; height: fit-content"
-          >
-            {#
-            <div class="card-header">좋아요</div>
-            #} {% if request.user in blog.likes.all %}
+                    {% if request.user in blog.likes.all %}
 
-            <img
-              style="width: 50px; height: 50px"
-              src="{% static 'heartbutton_2.svg' %}"
-              onclick="likeUnlikeBlog()"
-              alt="좋아요 버튼"
-            />
-            {% else %}
-            <img
-              style="width: 50px; height: 50px"
-              src="{% static 'heartbutton_99629.svg' %}"
-              onclick="likeUnlikeBlog()"
-              alt="좋아요 버튼"
-            />
-            {% endif %}
-            <p class="card-text text-center">좋아요 {{ blog.likes.count }}개</p>
-          </div>
+                        <img
+                                style="width: 50px; height: 50px"
+                                src="{% static 'heartbutton_2.svg' %}"
+                                onclick="likeUnlikeBlog()"
+                                alt="좋아요 버튼"
+                        />
+                    {% else %}
+                        <img
+                                style="width: 50px; height: 50px"
+                                src="{% static 'heartbutton_99629.svg' %}"
+                                onclick="likeUnlikeBlog()"
+                                alt="좋아요 버튼"
+                        />
+                    {% endif %}
+                    <p class="mt-2 card-text text-center">좋아요 {{ blog.likes.count }}개</p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
     {# 클래스 선언부 #}
     <script>
-      class Author {
-        constructor(json) {
-          this.id = json['pk'];
-          this.name = json['name'];
-          this.nickname = json['nickname'];
-          this.email = json['email'];
-          this.description = json['description'];
-          this.profile_image = json['profile_image'];
+        class Author {
+            constructor(json) {
+                this.id = json['pk'];
+                this.name = json['name'];
+                this.nickname = json['nickname'];
+                this.email = json['email'];
+                this.description = json['description'];
+                this.profile_image = json['profile_image'];
+            }
         }
-      }
 
-      class Comment {
-        constructor(json) {
-          this.id = json['id'];
-          this.blog = json['blog'];
-          this.content = json['content'];
+        class Comment {
+            constructor(json) {
+                this.id = json['id'];
+                this.blog = json['blog'];
+                this.content = json['content'];
 
-          this.author = new Author(json['author']);
-          this.created_at = json['created_at'];
-          this.updated_at = json['updated_at'];
+                this.author = new Author(json['author']);
+                this.created_at = json['created_at'];
+                this.updated_at = json['updated_at'];
 
-          let replyList = [];
-          for (let reply of json['reply']) {
-            replyList.push(new Recomment(reply));
-          }
-          this.reply = replyList;
+                let replyList = [];
+                for (let reply of json['reply']) {
+                    replyList.push(new Recomment(reply));
+                }
+                this.reply = replyList;
+            }
         }
-      }
 
-      class Recomment {
-        constructor(json) {
-          this.id = json['id'];
-          this.content = json['content'];
-          this.author = new Author(json['author']);
-          this.parent_comment = json['parent_comment'];
-          this.created_at = json['created_at'];
-          this.updated_at = json['updated_at'];
+        class Recomment {
+            constructor(json) {
+                this.id = json['id'];
+                this.content = json['content'];
+                this.author = new Author(json['author']);
+                this.parent_comment = json['parent_comment'];
+                this.created_at = json['created_at'];
+                this.updated_at = json['updated_at'];
+            }
         }
-      }
     </script>
     {# 좋아요 #}
     <script>
-      async function likeUnlikeBlog() {
+        async function likeUnlikeBlog() {
 
-          {% if request.user.is_authenticated %}
-              const res = await fetch(`http://localhost:8000{% url 'blog:blog_like' pk=blog.pk %}`, {
-                  method: 'POST',
-                  redirect: 'follow',
-                  headers: {
-                      'X-CSRFToken': await getToken()
-                  }
-              })
+            {% if request.user.is_authenticated %}
+                const res = await fetch(`http://localhost:8000{% url 'blog:blog_like' pk=blog.pk %}`, {
+                    method: 'POST',
+                    redirect: 'follow',
+                    headers: {
+                        'X-CSRFToken': await getToken()
+                    }
+                })
 
-              if (res.redirected) {
-                  window.location.href = res.url
-              }
-          {% else %}
-              alert('로그인이 필요한 기능입니다.')
-          {% endif %}
+                if (res.redirected) {
+                    window.location.href = res.url
+                }
+            {% else %}
+                alert('로그인이 필요한 기능입니다.')
+            {% endif %}
 
 
-      }
+        }
     </script>
     {# 댓글 추가 및 토큰 가져오기#}
     <script>
-      async function getToken() {
-          const res = await fetch('http://localhost:8000/accounts/token')
-          const data = await res.json()
-          return data['token']
-      }
+        async function getToken() {
+            const res = await fetch('http://localhost:8000/accounts/token')
+            const data = await res.json()
+            return data['token']
+        }
 
-      async function addComment() {
+        async function addComment() {
 
 
-          {% if request.user.is_authenticated %}
-              const token = await getToken()
-              const $comment = document.getElementById('id_content')
-              const $blog = document.getElementById('id_blog')
-              const $id_author = document.getElementById('id_author')
+            {% if request.user.is_authenticated %}
+                const token = await getToken()
+                const $comment = document.getElementById('id_content')
+                const $blog = document.getElementById('id_blog')
+                const $id_author = document.getElementById('id_author')
 
-              const body = {
-                  'content': $comment.value,
-                  'blog': $blog.value,
-                  'author': $id_author.value
-              }
+                const body = {
+                    'content': $comment.value,
+                    'blog': $blog.value,
+                    'author': $id_author.value
+                }
 
-              const res = await fetch(`http://localhost:8000{% url 'blog:comments:add_comment' blog.pk%}`,
-                  {
-                      method: 'POST',
-                      headers: {'Content-Type': "application/json", 'X-CSRFToken': token},
-                      body: JSON.stringify(body),
-                      redirect: 'follow'
-                  },
-              )
+                const res = await fetch(`http://localhost:8000{% url 'blog:comments:add_comment' blog.pk%}`,
+                    {
+                        method: 'POST',
+                        headers: {'Content-Type': "application/json", 'X-CSRFToken': token},
+                        body: JSON.stringify(body),
+                        redirect: 'follow'
+                    },
+                )
 
-              if (res.redirected) {
-                  window.location.href = res.url
-              }
+                if (res.redirected) {
+                    window.location.href = res.url
+                }
 
-              if (res.status === 200) {
-                  const data = await res.json()
-                  const commentList = await getComment()
-              } else if (res.status === 404) {
-                  alert('삭제된 글입니다.')
-              } else {
-                  alert('오류가 발생했습니다.')
-              }
-          {% else %}
-              alert('로그인이 필요한 기능입니다.')
-          {% endif %}
-      }
+                if (res.status === 200) {
+                    const data = await res.json()
+                    const commentList = await getComment()
+                } else if (res.status === 404) {
+                    alert('삭제된 글입니다.')
+                } else {
+                    alert('오류가 발생했습니다.')
+                }
+            {% else %}
+                alert('로그인이 필요한 기능입니다.')
+            {% endif %}
+        }
     </script>
     {# 대댓글 추가 #}
     <script>
-      function createReplyInput(commentId) {
-        console.log('답글 달기를 클릭하였습니다!');
-        const $replyForm = document.createElement('div');
-        $replyForm.classList.add('reply-form', 'd-flex', 'flex-column', 'pt-4');
+        function createReplyInput(commentId) {
+            console.log('답글 달기를 클릭하였습니다!');
+            const $replyForm = document.createElement('div');
+            $replyForm.classList.add('reply-form', 'd-flex', 'flex-column', 'pt-4');
 
-        const $input = document.createElement('textarea');
-        $input.className = 'form-control';
-        $input.setAttribute('name', 'content');
-        $input.setAttribute('type', 'text');
+            const $input = document.createElement('textarea');
+            $input.className = 'form-control';
+            $input.setAttribute('name', 'content');
+            $input.setAttribute('type', 'text');
 
-        const $button = document.createElement('button');
-        $button.innerText = '답글달기';
-        $button.classList.add('btn', 'btn-primary', 'mt-2', 'align-self-end');
-        $button.setAttribute('type', 'button');
-        $button.setAttribute('onclick', `addReply(${commentId})`);
+            const $button = document.createElement('button');
+            $button.innerText = '답글달기';
+            $button.classList.add('btn', 'btn-primary', 'mt-2', 'align-self-end');
+            $button.setAttribute('type', 'button');
+            $button.setAttribute('onclick', `addReply(${commentId})`);
 
-        $replyForm.appendChild($input);
-        $replyForm.appendChild($button);
+            $replyForm.appendChild($input);
+            $replyForm.appendChild($button);
 
-        const $comment = document.getElementById(`comment${commentId}`);
-        const $replies = $comment.getElementsByClassName('replies');
-        $comment.insertBefore($replyForm, $replies[0]);
-      }
+            const $comment = document.getElementById(`comment${commentId}`);
+            const $replies = $comment.getElementsByClassName('replies');
+            $comment.insertBefore($replyForm, $replies[0]);
+        }
 
-      async function addReply(commentId) {
-        const $comment = document.getElementById(`comment${commentId}`);
-        const content = $comment.getElementsByTagName('textarea')[0].value;
+        async function addReply(commentId) {
+            const $comment = document.getElementById(`comment${commentId}`);
+            const content = $comment.getElementsByTagName('textarea')[0].value;
 
-        let token = await getToken();
-        let res = await fetch(
-          `http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}/reply/`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': token,
-            },
-            body: JSON.stringify({ content: content }),
-          },
-        );
+            let token = await getToken();
+            let res = await fetch(
+                `http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}/reply/`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': token,
+                    },
+                    body: JSON.stringify({content: content}),
+                },
+            );
 
-        let data = await res.json();
-        console.log(data);
+            let data = await res.json();
+            console.log(data);
 
-        await getComment();
-      }
+            await getComment();
+        }
     </script>
     {# 댓글 수정 #}
     <script>
-      async function transferCommentToInput(commentId, reply = false) {
-        if (reply) {
-          const $reply = document.getElementById(`reply${commentId}`);
-          const content = document.querySelector(
-            `#reply${commentId}-content`,
-          ).innerText;
-          $reply.innerHTML = `<div class="container d-flex flex-column mt-4" >
+        async function transferCommentToInput(commentId, reply = false) {
+            if (reply) {
+                const $reply = document.getElementById(`reply${commentId}`);
+                const content = document.querySelector(
+                    `#reply${commentId}-content`,
+                ).innerText;
+                $reply.innerHTML = `<div class="container d-flex flex-column mt-4" >
 <textarea class="form-control" name='content'>${content}</textarea>
 <button class="btn btn-primary mt-2 align-self-end" onclick="editComment(${commentId},${reply})">수정하기</button>
 </div>`;
-        } else {
-          const $comment = document.getElementById(`comment${commentId}`);
-          const content = document.querySelector(
-            `#comment${commentId}-content`,
-          ).innerText;
+            } else {
+                const $comment = document.getElementById(`comment${commentId}`);
+                const content = document.querySelector(
+                    `#comment${commentId}-content`,
+                ).innerText;
 
-          const $replies = $comment.getElementsByClassName('replies');
-          const replyList = [];
-          for (let reply of $replies) {
-            replyList.push(reply);
-          }
-          const $container = `<div class="container d-flex flex-column mt-4" >
+                const $replies = $comment.getElementsByClassName('replies');
+                const replyList = [];
+                for (let reply of $replies) {
+                    replyList.push(reply);
+                }
+                const $container = `<div class="container d-flex flex-column mt-4" >
 <textarea class="form-control" name='content'>${content}</textarea>
 <button class="btn btn-primary mt-2 align-self-end" onclick="editComment(${commentId},${reply})">수정하기</button>
 </div>`;
-          $comment.innerHTML = '';
-          $comment.innerHTML = $container;
-          for (let reply of replyList) {
-            reply.style.marginLeft = '50px';
-            console.log(reply);
-            $comment.appendChild(reply);
-          }
+                $comment.innerHTML = '';
+                $comment.innerHTML = $container;
+                for (let reply of replyList) {
+                    reply.style.marginLeft = '50px';
+                    console.log(reply);
+                    $comment.appendChild(reply);
+                }
+            }
         }
-      }
 
-      async function editComment(commentId, reply) {
-        if (reply) {
-          const content = document
-            .getElementById(`reply${commentId}`)
-            .getElementsByTagName('textarea')[0];
-          console.log(content.value);
-          await fetch(
-            `http://localhost:8000/blog/{{ blog.pk }}/comment/reply/${commentId}/`,
-            {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': await getToken(),
-              },
-              body: JSON.stringify({ content: content.value }),
-            },
-          );
-        } else {
-          const content = document
-            .getElementById(`comment${commentId}`)
-            .getElementsByTagName('textarea')[0];
-          console.log(content.value);
-          await fetch(
-            `http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}/`,
-            {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': await getToken(),
-              },
-              body: JSON.stringify({ content: content.value }),
-            },
-          );
+        async function editComment(commentId, reply) {
+            if (reply) {
+                const content = document
+                    .getElementById(`reply${commentId}`)
+                    .getElementsByTagName('textarea')[0];
+                console.log(content.value);
+                await fetch(
+                    `http://localhost:8000/blog/{{ blog.pk }}/comment/reply/${commentId}/`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': await getToken(),
+                        },
+                        body: JSON.stringify({content: content.value}),
+                    },
+                );
+            } else {
+                const content = document
+                    .getElementById(`comment${commentId}`)
+                    .getElementsByTagName('textarea')[0];
+                console.log(content.value);
+                await fetch(
+                    `http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}/`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': await getToken(),
+                        },
+                        body: JSON.stringify({content: content.value}),
+                    },
+                );
+            }
+            await getComment();
         }
-        await getComment();
-      }
     </script>
     {# 댓글 삭제 #}
     <script>
-      async function deleteComment(commentId, reply = false) {
-        const confirm = window.confirm('댓글을 삭제하시겠습니까?');
-        if (confirm) {
-          let url = '';
-          if (reply) {
-            url = `http://localhost:8000/blog/{{ blog.pk }}/comment/reply/${commentId}`;
-            console.log(`대댓글 ${commentId}를 삭제합니다.`);
-          } else {
-            url = `http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}`;
-            console.log(`댓글 ${commentId}를 삭제합니다.`);
-          }
-          const res = await fetch(url, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': await getToken(),
-            },
-          });
-          const data = await res.json();
-          console.log(data);
-          await getComment();
+        async function deleteComment(commentId, reply = false) {
+            const confirm = window.confirm('댓글을 삭제하시겠습니까?');
+            if (confirm) {
+                let url = '';
+                if (reply) {
+                    url = `http://localhost:8000/blog/{{ blog.pk }}/comment/reply/${commentId}`;
+                    console.log(`대댓글 ${commentId}를 삭제합니다.`);
+                } else {
+                    url = `http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}`;
+                    console.log(`댓글 ${commentId}를 삭제합니다.`);
+                }
+                const res = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': await getToken(),
+                    },
+                });
+                const data = await res.json();
+                console.log(data);
+                await getComment();
+            }
         }
-      }
     </script>
     {# 댓글 가져오기 #}
     <script>
-              let author = '{{request.user.nickname}}';
+        let author = '{{request.user.nickname}}';
 
-              async function getComment() {
-                  const res = await fetch(
-                      `http://localhost:8000{% url 'blog:comments:comment_list' blog.pk%}`,
-                  );
-                  const data = await res.json();
-                  const commentList = [];
+        async function getComment() {
+            const res = await fetch(
+                `http://localhost:8000{% url 'blog:comments:comment_list' blog.pk%}`,
+            );
+            const data = await res.json();
+            const commentList = [];
 
-                  for (let i = 0; i < data.length; i++) {
-                      commentList.push(new Comment(data[i]));
-                  }
+            for (let i = 0; i < data.length; i++) {
+                commentList.push(new Comment(data[i]));
+            }
 
-                  renderComment(commentList);
-              }
+            renderComment(commentList);
+        }
 
-              /**
-               * @param comments {Array<Comment>}
-               */
-              function renderComment(comments) {
-                  let $comment = document.getElementById('comment');
-                  $comment.innerHTML = '';
+        /**
+         * @param comments {Array<Comment>}
+         */
+        function renderComment(comments) {
+            let $comment = document.getElementById('comment');
+            $comment.innerHTML = '';
 
-                  for (let comment of comments) {
-                      let $container = document.createElement('div');
-                      $container.id = `comment${comment.id}`;
-                      $container.classList.add('comment-container')
-                      $container.classList.add('mb-4')
-                      $container.classList.add('d-flex')
-                      $container.classList.add('flex-column')
+            for (let comment of comments) {
+                let $container = document.createElement('div');
+                $container.id = `comment${comment.id}`;
+                $container.classList.add('comment-container')
+                $container.classList.add('mb-4')
+                $container.classList.add('d-flex')
+                $container.classList.add('flex-column')
 
 
-                      {% if request.user.is_authenticated %}
-                          let buttons = `<div class="button-container d-flex"  style="align-self: flex-start" >
+                {% if request.user.is_authenticated %}
+                    let buttons = `<div class="button-container d-flex"  style="align-self: flex-start" >
       <p class="text-muted fst-italic reply-button text-decoration-underline px-2" onclick="createReplyInput(${comment.id})">답글달기</p>`
-                          if (comment.author.nickname === author) {
-                              buttons += `<p class="text-muted fst-italic  text-decoration-underline px-2" onclick="transferCommentToInput(${comment.id})">수정하기</p>
+                    if (comment.author.nickname === author) {
+                        buttons += `<p class="text-muted fst-italic  text-decoration-underline px-2" onclick="transferCommentToInput(${comment.id})">수정하기</p>
       <p class="text-muted fst-italic  text-decoration-underline px-2" onclick="deleteComment(${comment.id})">삭제하기</p>`
-                          }
-                          buttons += `</div>`
-                          $container.innerHTML += buttons
-                      {% endif %}
+                    }
+                    buttons += `</div>`
+                    $container.innerHTML += buttons
+                {% endif %}
 
-                      let content = ``
-                      if (comment.reply.length === 0) {
-                          content = `<div class="d-flex" style="width: 100%">
+                let content = ``
+                if (comment.reply.length === 0) {
+                    content = `<div class="d-flex" style="width: 100%">
                           <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
                           <div id="comment${comment.id}-content"  class="ms-3">
                               <div id="comment${comment.id}-author" class="fw-bold">${comment.author.nickname}</div>
                               ${comment.content}
                           </div>
                       </div>`
-                      } else {
-                          let replies = ``
-                          for (let reply of comment.reply) {
-                              let replyContent = `<div id='reply${reply.id}'>`
-                              {% if request.user.is_authenticated %}
-                                  let buttons = `<div class="button-container justify-content-end align-content-end" style="display: flex; width: 100%">`
+                } else {
+                    let replies = ``
+                    for (let reply of comment.reply) {
+                        let replyContent = `<div id='reply${reply.id}'>`
+                        {% if request.user.is_authenticated %}
+                            let buttons = `<div class="button-container justify-content-end align-content-end" style="display: flex; width: 100%">`
 
-                                  if (reply.author.nickname === author) {
-                                      buttons += `<p class="text-muted fst-italic  text-decoration-underline px-2" onclick="transferCommentToInput(${reply.id},true)">수정하기</p>`
-                                      buttons += `<p class="text-muted fst-italic  text-decoration-underline px-2" onclick="deleteComment(${reply.id},true)">삭제하기</p>`
-                                  }
-                                  buttons += `</div>`
-                                  replyContent += buttons
-                              {% endif %}
-                              replyContent += `<!-- Child comment 1-->
+                            if (reply.author.nickname === author) {
+                                buttons += `<p class="text-muted fst-italic  text-decoration-underline px-2" onclick="transferCommentToInput(${reply.id},true)">수정하기</p>`
+                                buttons += `<p class="text-muted fst-italic  text-decoration-underline px-2" onclick="deleteComment(${reply.id},true)">삭제하기</p>`
+                            }
+                            buttons += `</div>`
+                            replyContent += buttons
+                        {% endif %}
+                        replyContent += `<!-- Child comment 1-->
                                               <div  class="d-flex mb-4">
                                                   <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
                                                   <div  class="ms-3">
@@ -478,12 +477,12 @@
                                                       <p id="reply${reply.id}-content">${reply.content}</p>
                                                   </div>
                                               </div>`
-                              replyContent += `</div>`
-                              replies += replyContent
-                          }
+                        replyContent += `</div>`
+                        replies += replyContent
+                    }
 
 
-                          content = `<div class="d-flex mb-2">
+                    content = `<div class="d-flex mb-2">
                                           <!-- Parent comment-->
                                           <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
                                           <div  class="ms-3">
@@ -491,35 +490,35 @@
                                               <p id='comment${comment.id}-content'>${comment.content}</p>
                                               <div class="replies mt-4">${replies}</div>
                                       </div>`
-                      }
+                }
 
 
-                      $container.innerHTML += content
-                      $comment.appendChild($container);
-                  }
-              }
+                $container.innerHTML += content
+                $comment.appendChild($container);
+            }
+        }
 
-              window.onload = async function () {
-                  const $contentSection = document.getElementById('content-section');
-                  const $pContenst = $contentSection.getElementsByTagName('p')
-                  for (let i = 0; i < $pContenst.length; i++) {
-                      $pContenst[i].className = 'fs-5 mb-4'
-                  }
+        window.onload = async function () {
+            const $contentSection = document.getElementById('content-section');
+            const $pContenst = $contentSection.getElementsByTagName('p')
+            for (let i = 0; i < $pContenst.length; i++) {
+                $pContenst[i].className = 'fs-5 mb-4'
+            }
 
-                  const $commentInput = document.getElementById('id_content')
-                  $commentInput.className = 'form-control'
+            const $commentInput = document.getElementById('id_content')
+            $commentInput.className = 'form-control'
 
-                  const $contentImg = document.getElementById('content-section').getElementsByTagName('img')
+            const $contentImg = document.getElementById('content-section').getElementsByTagName('img')
 
-                  for (let i = 0; i < $contentImg.length; i++) {
-                      $contentImg[i].classList.add('position-relative')
-                      $contentImg[i].style.maxWidth = '100%'
-                  }
+            for (let i = 0; i < $contentImg.length; i++) {
+                $contentImg[i].classList.add('position-relative')
+                $contentImg[i].style.maxWidth = '100%'
+            }
 
 
-                  await getComment();
-              };
+            await getComment();
+        };
     </script>
-    {% endblock %}
-  </body>
+{% endblock %}
+</body>
 </html>

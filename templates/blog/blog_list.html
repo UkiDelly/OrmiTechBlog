@@ -31,6 +31,13 @@
                         <div class="card-body">
                             <div class="small text-muted">{{ most_like.created_at }}</div>
                             <h2 class="card-title">{{ most_like.title }}</h2>
+
+                            {% for category in most_like.categorys.all %}
+                                <a
+                                        class="badge bg-secondary text-decoration-none link-light"
+                                        href="{% url 'blog:category_search' category.pk %}"
+                                >{{ category.name }}</a>
+                            {% endfor %}
                             <p class="card-text">
                                 {{ most_like.content|striptags|truncatechars:200 }}
                             </p>
