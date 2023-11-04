@@ -1,3 +1,5 @@
+{% extends 'blog/index.html' %}
+{% load static %}
 <!doctype html>
 <html lang="ko-KR">
 <head>
@@ -5,13 +7,24 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>블로그 삭제</title>
+    {% block title %}
+        <title>블로그 삭제</title>
+    {% endblock %}
 </head>
 <body>
-<form action="" method="post">
-    {% csrf_token %}
-    <p>정말로 삭제하시겠습니까?</p>
-    <input type="submit" value="submit">
-</form>
+{% block body %}
+    <div class="container m-4 p-4 m-4 d-flex flex-column justify-content-center align-self-center ">
+        <form class="form-control d-flex flex-column p-4" style="width: 100%;" action="" method="post">
+            {% csrf_token %}
+            <div class="container p-2 rounded text-center"
+                 style="width: 100%;">
+                <p class="m-2">정말로 삭제하시겠습니까?</p>
+            </div>
+            <input class=" mt-2 btn btn-primary "
+                   type="submit" value="확인">
+        </form>
+
+    </div>
+{% endblock %}
 </body>
 </html>
