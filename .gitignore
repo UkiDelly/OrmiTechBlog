@@ -163,3 +163,4 @@ cython_debug/
 database
 */migrations/*
 media
+collected_static
