@@ -10,7 +10,72 @@
 </head>
 <body>
 {% block body %}
-    {% for post in blogs %}{{ post }}{% endfor %}
+    <div class="container d-flex flex-column">
+        <div class="text-center my-5 ">
+            <h1 class="fw-bolder">{{ request.user.nickname }}님의 블로그</h1>
+            <p class="lead mb-0">A Bootstrap 5 starter layout for your next blog homepage</p>
+        </div>
+
+        <div class="container d-flex flex-row">
+
+            <div class="d-flex flex-column col-6 m-2">
+                {% for blog in blogs %}
+                    {% if not blog.id|divisibleby:2 %}
+                        <div class="card mb-4">
+                            <a href="{% url 'blog:blog_detail' blog.id %}">
+                                <img class="card-img-top"
+                                     src='http://localhost:8000{{ blog.thumbnail.url }}'
+                                     style="height: 350px"
+                                     alt="..."/>
+                            </a>
+                            <div class="card-body">
+                                <div class="small text-muted">{{ blog.created_at }}</div>
+                                <h2 class="card-title h4">{{ blog.title }}</h2>
+                                {% for category in blog.categorys.all %}
+                                    <a
+                                            class="badge bg-secondary text-decoration-none link-light"
+                                            href="#!"
+                                    >{{ category }}</a
+                                    >
+                                {% endfor %}
+                                <p class="mt-2 card-text">{{ blog.content|striptags|truncatechars:100 }}</p>
+                                <a class="btn btn-primary" href="{% url 'blog:blog_detail' blog.id %}">더 보기 →</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class=" d-flex flex-column col-6 m-2">
+                {% for blog in blogs %}
+                    {% if  blog.id|divisibleby:2 %}
+                        <div class="card mb-4">
+                            <a href="{% url 'blog:blog_detail' blog.id %}">
+                                <img class="card-img-top"
+                                     src='http://localhost:8000{{ blog.thumbnail.url }}'
+                                     style="height: 350px"
+                                     alt="..."/>
+                            </a>
+                            <div class="card-body">
+                                <div class="small text-muted">{{ blog.created_at }}</div>
+                                <h2 class="card-title h4">{{ blog.title }}</h2>
+                                {% for category in blog.categorys.all %}
+                                    <a
+                                            class="badge bg-secondary text-decoration-none link-light"
+                                            href="{% url 'blog:category_search' category.pk %}"
+                                    >{{ category }}</a
+                                    >
+                                {% endfor %}
+                                <p class="mt-2 card-text">{{ blog.content|striptags|truncatechars:100 }}</p>
+                                <a class="btn btn-primary" href="{% url 'blog:blog_detail' blog.id %}">더 보기 →</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+
+        </div>
+    </div>
 {% endblock %}
 </body>
 </html>

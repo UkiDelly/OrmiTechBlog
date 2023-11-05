@@ -21,19 +21,34 @@
             <!-- Blog entries-->
             <div class="col-lg-8">
                 {% if most_like %}
-                <!-- Featured blog post-->
-                <div class="card mb-4">
-                    <a href="{% url 'blog:blog_detail' most_like.pk %}">
-                        <img class="card-img-top" src="{{ most_like.thumbnail.url }}" alt="..." /></a>
-                    <div class="card-body">
-                        <div class="small text-muted">{{ most_like.created_at }}</div>
-                        <h2 class="card-title">{{ most_like.title }}</h2>
-                        <p class="card-text">
-                            {{ most_like.content|striptags|truncatechars:200 }}
-                        </p>
-                        <a class="btn btn-primary" href="{% url 'blog:blog_detail' most_like.pk %}">더보기 →</a>
+                    <!-- Featured blog post-->
+                    <div class="card mb-4">
+                        <a href="{% url 'blog:blog_detail' most_like.pk %}">
+                            <img
+                                    class="card-img-top"
+                                    src="http://localhost:8000{{ most_like.thumbnail.url }}"
+                                    alt="..."
+                            /></a>
+                        <div class="card-body">
+                            <div class="small text-muted">{{ most_like.created_at }}</div>
+                            <h2 class="card-title">{{ most_like.title }}</h2>
+
+                            {% for category in most_like.categorys.all %}
+                                <a
+                                        class="badge bg-secondary text-decoration-none link-light"
+                                        href="{% url 'blog:category_search' category.pk %}"
+                                >{{ category.name }}</a>
+                            {% endfor %}
+                            <p class="card-text">
+                                {{ most_like.content|striptags|truncatechars:200 }}
+                            </p>
+                            <a
+                                    class="btn btn-primary"
+                                    href="{% url 'blog:blog_detail' most_like.pk %}"
+                            >더보기 →</a
+                            >
+                        </div>
                     </div>
-                </div>
                 {% endif %}
                 <!-- Nested row for non-featured blog posts-->
                 <p class="h1">포스트</p>

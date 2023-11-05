@@ -145,7 +145,7 @@ class MyBlogView(LoginRequiredMixin, ListView):
             "-created_at"
         )
 
-        context = {"blogs": [post.to_json() for post in user_blog]}
+        context = {"blogs": user_blog}
         return context
 
 
