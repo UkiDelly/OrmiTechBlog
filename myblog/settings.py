@@ -29,9 +29,9 @@ environ.Env.read_env(env_file=os.path.join(BASE_DIR, "config.env"))
 SECRET_KEY = "django-insecure-#p#gcycnod&@r_-j%zrt@y#70)24xwpq+=_7ammifcnmvdx$9%"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com', "*"]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com']
 
 # Application definition
 
@@ -142,10 +142,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
 
-# MEDIA_URL = "/media/"
-# MEDIA_ROOT = BASE_DIR / "media"
-
-
 CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = ["http://*/*", "https://*/*"]
 
@@ -155,15 +151,21 @@ AWS_STORAGE_BUCKET_NAME: Final[str] = "delly-djangoblog"
 AWS_ACCESS_KEY_ID: Final[str] = env("AWS_ACCESS")
 AWS_SECRET_ACCESS_KEY: Final[str] = env("AWS_SECRET_ACCESS")
 
-AWS_S3_CUSTOM_DOMAIN: Final = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com"
+AWS_S3_CUSTOM_DOMAIN: Final = f"{
+AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com"
 
 # Static Settings ()
 # STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
 # STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
-######## Media Setting (배포할때만)
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+# Media Setting (배포할때만)
+if DEBUG:
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
+    CKEDITOR_UPLOAD_PATH = MEDIA_ROOT
+else:
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    MEDIA_URL = f"https: //{AWS_S3_CUSTOM_DOMAIN}/media/"
+    CKEDITOR_UPLOAD_PATH = MEDIA_URL
 
-CKEDITOR_UPLOAD_PATH = MEDIA_URL
 CKEDITOR_IMAGE_BACKEND = "pillow"

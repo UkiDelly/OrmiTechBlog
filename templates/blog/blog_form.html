@@ -1,76 +1,79 @@
-{% extends "blog/index.html" %}
-{% load static %}
-<!doctype html>
+{% extends "blog/index.html" %} {% load static %}
+<!DOCTYPE html>
 <html lang="ko-KR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>블로그 작성하기</title>
-</head>
-<body>
-{% block body %}
-    <div class="container d-flex flex-column" style="min-height: 1080px; width: 100%">
+  </head>
+  <body>
+    {% block body %}
+    <div
+      class="container d-flex flex-column"
+      style="min-height: 1080px; width: 100%"
+    >
+      <form
+        class="d-flex flex-column"
+        action=""
+        method="post"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="container d-flex flex-column mt-4">
+          {{ form.media }}
+          <p class="h1">제목</p>
+          {{ form.title }}
 
-        <form class="d-flex flex-column" action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="container d-flex flex-column mt-4">
-                {{ form.media }}
-                <p class="h1"> 제목 </p>
-                {{ form.title }}
-
-                <div class="d-flex flex-row mb-4">
-
-                    <div class="d-flex flex-column">
-                        <p class="h3 mb-3">썸네일</p>
-                        {{ form.thumbnail }}
-                    </div>
-
-                    <div class="d-flex flex-column" style="width: 80%">
-                        <p class="h3 mb-3">카테고리</p>
-                        {{ form.categorys }}
-
-                    </div>
-                </div>
-
-                {{ form.content }}
-
+          <div class="d-flex flex-row mb-4">
+            <div class="d-flex flex-column">
+              <p class="h3 mb-3">썸네일</p>
+              {{ form.thumbnail }}
             </div>
-            <input class="btn btn-primary m-4 align-self-end" style="width: 20%; height: 50px" type="submit"
-                   value="등록하기">
-        </form>
 
+            <div class="d-flex flex-row" style="width: 10%"></div>
+
+            <div class="d-flex flex-column ml-3" style="width: 80%">
+              <p class="h3 mb-3">카테고리</p>
+              {{ form.categorys }}
+            </div>
+          </div>
+
+          {{ form.content }}
+        </div>
+        <input
+          class="btn btn-primary m-4 align-self-end"
+          style="width: 20%; height: 50px"
+          type="submit"
+          value="등록하기"
+        />
+      </form>
     </div>
 
-
     <script>
+      function setup() {
+        const $titleInput = document.getElementById('id_title');
+        const $fileInput = document.getElementById('id_thumbnail');
+        const $categorys = document.getElementById('id_categorys');
+        const $options = document.getElementsByTagName('option');
 
-        function setup() {
-            const $titleInput = document.getElementById('id_title');
-            const $fileInput = document.getElementById('id_thumbnail');
-            const $categorys = document.getElementById('id_categorys')
-            const $options = document.getElementsByTagName('option')
+        $titleInput.classList.add('form-control', 'mb-5', 'mt-2');
+        $fileInput.classList.add('mb-5', 'form-control');
 
-            $titleInput.classList.add('form-control', 'mb-5', 'mt-2')
-
-
-            $fileInput.classList.add('mb-5', 'custom-file')
-
-            for (let i = 0; i < $options.length; i++) {
-                $options[i].classList.add('py-2')
-            }
-
-            $categorys.classList.add("form-select")
-
-
+        for (let i = 0; i < $options.length; i++) {
+          $options[i].classList.add('py-2');
         }
 
-        window.onload = function () {
-            setup()
-        }
+        $categorys.classList.add('form-select');
+      }
 
+      window.onload = function () {
+        setup();
+      };
     </script>
-{% endblock %}
-</body>
+    {% endblock %}
+  </body>
 </html>

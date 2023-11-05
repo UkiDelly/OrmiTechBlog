@@ -17,7 +17,7 @@ class Blog(BaseDateTime):
     title = models.CharField(max_length=100)
 
     def get_upload_to(self, filename):
-        return f"blog/{self.pk}/{filename}"
+        return f"blog/%Y/%m/%d/{filename}"
 
     thumbnail = models.ImageField(upload_to=get_upload_to, blank=True, null=True, )
     content = RichTextUploadingField(blank=True, null=True)

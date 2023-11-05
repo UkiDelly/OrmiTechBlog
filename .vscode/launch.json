@@ -12,7 +12,8 @@
       "autoReload": {"enable": true},
       "console": "internalConsole",
       "args": [
-        "runserver"
+        "runserver",
+        "0:8080"
       ],
       "django": true,
       "justMyCode": true
