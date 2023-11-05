@@ -31,7 +31,7 @@ SECRET_KEY = "django-insecure-#p#gcycnod&@r_-j%zrt@y#70)24xwpq+=_7ammifcnmvdx$9%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com']
 
 # Application definition
 
@@ -139,11 +139,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+# MEDIA_URL = "/media/"
+# MEDIA_ROOT = BASE_DIR / "media"
 
-CKEDITOR_UPLOAD_PATH = MEDIA_ROOT
-CKEDITOR_IMAGE_BACKEND = "pillow"
 
 CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = ["http://*/*", "https://*/*"]
@@ -161,6 +159,8 @@ AWS_S3_CUSTOM_DOMAIN: Final = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazon
 # STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 ######## Media Setting (배포할때만)
-# MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
-# DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+CKEDITOR_UPLOAD_PATH = MEDIA_URL
+CKEDITOR_IMAGE_BACKEND = "pillow"
