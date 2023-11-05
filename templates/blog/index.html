@@ -13,7 +13,7 @@
         <title>Blog</title>
     {% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column">
 
 <!-- Responsive navbar-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -45,9 +45,10 @@
 </nav>
 
 
-{% block body %}
-{% endblock %}
-
+<div class="container">
+    {% block body %}
+    {% endblock %}
+</div>
 
 
 <!-- Footer-->

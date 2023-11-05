@@ -1,6 +1,6 @@
 # Create your views here.
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.http import HttpRequest, JsonResponse, HttpResponseRedirect
 from django.middleware import csrf
 from django.urls import reverse_lazy
@@ -54,6 +54,10 @@ class UserInfoUpdateView(LoginRequiredMixin, UpdateView):
         if form.is_valid():
             form.save()
         return HttpResponseRedirect(self.get_success_url())
+
+
+class UserPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    template_name = "accounts/user_password_change_form.html"
 
 
 def get_token(request: HttpRequest):
