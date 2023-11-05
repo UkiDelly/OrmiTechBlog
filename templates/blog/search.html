@@ -45,7 +45,7 @@
                 <a class="overflow-hidden" style="height: 350px" href="{% url 'blog:blog_detail' blog.pk %}">
                     <img
                             class="card-img-top"
-                            src="http://localhost:8000{{ blog.thumbnail.url }}"
+                            src="http://localhost:8080{{ blog.thumbnail.url }}"
                             alt="..."/>
                 </a>
                 <div class="card-body">
@@ -74,7 +74,7 @@
             const $searchInput = document.getElementsByClassName("search-input")[0];
 
             const searchValue = $searchInput.value;
-            const res = await fetch(`http://localhost:8000/blog/search?q=${searchValue}`, {
+            const res = await fetch(`http://localhost:8080/blog/search?q=${searchValue}`, {
                 method: "GET",
                 redirect: "follow"
             });

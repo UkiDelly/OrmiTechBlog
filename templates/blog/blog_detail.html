@@ -81,7 +81,7 @@
                                     id="comment-form"
                                     class="d-flex flex-column"
                                     action=" http:
-                            //localhost:8000{% url 'blog:comments:add_comment' blog.pk %}"
+                            //localhost:8080{% url 'blog:comments:add_comment' blog.pk %}"
                                     method="post"
                                     enctype="multipart/form-data">
                                 {% csrf_token %}
@@ -128,7 +128,7 @@
                     {% else %}
                         <img
                                 style="width: 50px; height: 50px"
-                                src="{% static 'heartbutton_99629.svg' %}"
+                                src="{% static 'heartbutton_1.svg' %}"
                                 onclick="likeUnlikeBlog()"
                                 alt="좋아요 버튼"
                         />
@@ -185,7 +185,7 @@
         async function likeUnlikeBlog() {
 
             {% if request.user.is_authenticated %}
-                const res = await fetch(`http://localhost:8000{% url 'blog:blog_like' pk=blog.pk %}`, {
+                const res = await fetch(`http://localhost:8080{% url 'blog:blog_like' pk=blog.pk %}`, {
                     method: 'POST',
                     redirect: 'follow',
                     headers: {
@@ -206,7 +206,7 @@
     {# 댓글 추가 및 토큰 가져오기#}
     <script>
         async function getToken() {
-            const res = await fetch('http://localhost:8000/accounts/token')
+            const res = await fetch('http://localhost:8080/accounts/token')
             const data = await res.json()
             return data['token']
         }
@@ -226,7 +226,7 @@
                     'author': $id_author.value
                 }
 
-                const res = await fetch(`http://localhost:8000{% url 'blog:comments:add_comment' blog.pk%}`,
+                const res = await fetch(`http://localhost:8080{% url 'blog:comments:add_comment' blog.pk%}`,
                     {
                         method: 'POST',
                         headers: {'Content-Type': "application/json", 'X-CSRFToken': token},
@@ -284,7 +284,7 @@
 
             let token = await getToken();
             let res = await fetch(
-                `http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}/reply/`,
+                `http://localhost:8080/blog/{{ blog.pk }}/comment/${commentId}/reply/`,
                 {
                     method: 'POST',
                     headers: {
@@ -345,7 +345,7 @@
                     .getElementsByTagName('textarea')[0];
                 console.log(content.value);
                 await fetch(
-                    `http://localhost:8000/blog/{{ blog.pk }}/comment/reply/${commentId}/`,
+                    `http://localhost:8080/blog/{{ blog.pk }}/comment/reply/${commentId}/`,
                     {
                         method: 'PUT',
                         headers: {
@@ -361,7 +361,7 @@
                     .getElementsByTagName('textarea')[0];
                 console.log(content.value);
                 await fetch(
-                    `http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}/`,
+                    `http://localhost:8080/blog/{{ blog.pk }}/comment/${commentId}/`,
                     {
                         method: 'PUT',
                         headers: {
@@ -382,10 +382,10 @@
             if (confirm) {
                 let url = '';
                 if (reply) {
-                    url = `http://localhost:8000/blog/{{ blog.pk }}/comment/reply/${commentId}`;
+                    url = `http://localhost:8080/blog/{{ blog.pk }}/comment/reply/${commentId}`;
                     console.log(`대댓글 ${commentId}를 삭제합니다.`);
                 } else {
-                    url = `http://localhost:8000/blog/{{ blog.pk }}/comment/${commentId}`;
+                    url = `http://localhost:8080/blog/{{ blog.pk }}/comment/${commentId}`;
                     console.log(`댓글 ${commentId}를 삭제합니다.`);
                 }
                 const res = await fetch(url, {
@@ -407,7 +407,7 @@
 
         async function getComment() {
             const res = await fetch(
-                `http://localhost:8000{% url 'blog:comments:comment_list' blog.pk%}`,
+                `http://localhost:8080{% url 'blog:comments:comment_list' blog.pk%}`,
             );
             const data = await res.json();
             const commentList = [];

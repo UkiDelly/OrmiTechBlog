@@ -114,6 +114,10 @@ class BlogDetailView(DetailView):
     model = Blog
     template_name = "blog/blog_detail.html"
 
+    def get_object(self, **kwargs):
+        pk = self.kwargs.get("pk")
+        return get_object_or_404(Blog, pk=pk)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs["pk"]
@@ -198,3 +202,7 @@ class LikeUnlikeView(LoginRequiredMixin, View):
         else:
             blog.likes.add(self.request.user)
         return redirect(reverse_lazy("blog:blog_detail", kwargs={"pk": kwargs["pk"]}))
+
+
+class Custom404(TemplateView):
+    template_name = "404.html"

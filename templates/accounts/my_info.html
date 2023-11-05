@@ -24,7 +24,7 @@
                         <div class=" text-white d-flex flex-row"
                              style="background-color: #222529; height:200px;">
                             <div class="ms-4 mt-5 d-flex flex-column" style="height: 150px;">
-                                <img src='http://localhost:8000{{ user.profile_image }}'
+                                <img src='http://localhost:8080{{ user.profile_image }}'
                                         {#  "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"#}
                                      alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
                                      style="height: 150px;  z-index: 1">
@@ -76,18 +76,18 @@
     <script>
 
         async function getToken() {
-            const res = await fetch('http://localhost:8000{% url "accounts:get_token" %}');
+            const res = await fetch('http://localhost:8080{% url "accounts:get_token" %}');
             const data = await res.json();
             console.log(data)
             return data['token'];
         }
 
         function profileEdit() {
-            window.location.href = 'http://localhost:8000{% url "accounts:my_info_update" %}';
+            window.location.href = 'http://localhost:8080{% url "accounts:my_info_update" %}';
         }
 
         function changePassword() {
-            window.location.href = 'http://localhost:8000{% url "accounts:change_password" %}';
+            window.location.href = 'http://localhost:8080{% url "accounts:change_password" %}';
         }
 
     </script>
