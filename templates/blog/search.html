@@ -25,13 +25,27 @@
             </button>
         </div>
     </div>
+
+    <div class="d-flex flex-row justify-content-between align-content-center "
+         style="padding-right: 20%; padding-left: 20%">
+        <p>총 {{ blogs.count }}개</p>
+        <form class="d-flex flex-row"
+              method="get">
+            <select name="sort" onchange="sortBlog()" class="form-select">
+                <option {% if sort == "new" %} selected {% endif %}  value="new">최신순
+                </option>
+                <option {% if sort == "old" %} selected {% endif %} value="old">등록순</option>
+            </select>
+        </form>
+
+    </div>
     <div class="container pt-4 px-sm-5 px-md-40 ">
         {% for blog in blogs %}
             <div class="card mb-4 ">
                 <a class="overflow-hidden" style="height: 350px" href="{% url 'blog:blog_detail' blog.pk %}">
                     <img
                             class="card-img-top"
-                            src="http://localhost:8000{{ blog.thumbnail.url }}"
+                            src="http://ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com:8080{{ blog.thumbnail.url }}"
                             alt="..."/>
                 </a>
                 <div class="card-body">
@@ -60,7 +74,7 @@
             const $searchInput = document.getElementsByClassName("search-input")[0];
 
             const searchValue = $searchInput.value;
-            const res = await fetch(`http://localhost:8000/blog/search?q=${searchValue}`, {
+            const res = await fetch(`http://ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com:8080/blog/search?q=${searchValue}`, {
                 method: "GET",
                 redirect: "follow"
             });
@@ -68,6 +82,11 @@
             if (res.redirected) {
                 window.location.href = res.url;
             }
+        }
+
+        async function sortBlog() {
+            const sort = document.querySelector('select[name="sort"]');
+            window.location.href = `{% url 'blog:search' %}?sort=${sort.value}` + `&q={{query}}`
         }
 
     </script>

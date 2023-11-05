@@ -1,0 +1,10 @@
+{% extends 'blog/index.html' %}
+{% load static %}
+{% block title %}
+    <title>404</title>
+{% endblock %}
+{% block body %}
+    <div class="container">
+        <img src="{% static '404.svg' %}" alt="Not Found">
+    </div>
+{% endblock %}
