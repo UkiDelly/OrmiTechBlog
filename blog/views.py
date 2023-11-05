@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.http import (
     HttpResponseBadRequest, HttpRequest, HttpResponseNotFound,
 )
@@ -56,13 +56,41 @@ class BlogSearchView(TemplateView):
 
     def get(self, request: HttpRequest, **kwargs):
         query = self.request.GET.get("q")
+        sort = self.request.GET.get("sort", 'new')
+
         context = {'query': query}
         blog_list = Blog.objects.filter(
             Q(title__icontains=query) | Q(content__in=query))
-        context["blogs"] = blog_list
 
+        context["sort"] = sort
+
+        if sort == 'old':
+            blog_list = blog_list.order_by('created_at')
+        else:
+            blog_list = blog_list.order_by('-created_at')
+        context["blogs"] = blog_list
         if not query:
             context["blogs"] = []
+        return self.render_to_response(context)
+
+
+class CategorySearchView(TemplateView):
+    http_method_names = ["get"]
+    template_name = "blog/category_search.html"
+
+    def get(self, request: HttpRequest, **kwargs):
+        category = get_object_or_404(Category, pk=kwargs["c_pk"])
+        sort = self.request.GET.get("sort")
+
+        if sort == 'old':
+            blog_list: QuerySet[Blog] = Blog.objects.filter(
+                categorys__name__icontains=category.name).order_by("created_at")
+        else:
+            blog_list: QuerySet[Blog] = Blog.objects.filter(
+                categorys__name__icontains=category.name).order_by("-created_at")
+        context = {"blogs": blog_list}
+        context["category"] = category
+        context["sort"] = sort
         return self.render_to_response(context)
 
 
@@ -70,6 +98,13 @@ def filter_category(request: HttpRequest, c_pk: int):
     category = get_object_or_404(Category, pk=c_pk)
     blog_list = Blog.objects.filter(
         categorys__name__icontains=category.name).order_by("-created_at")
+
+    sort = request.GET.get("sort")
+
+    if sort == 'old':
+        blog_list.order_by('created_at')
+    else:
+        blog_list.order_by('-created_at')
     context = {"blogs": blog_list}
     context["category"] = category
     return render(request, "blog/category_search.html", context)
