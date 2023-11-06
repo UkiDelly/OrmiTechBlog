@@ -31,7 +31,7 @@ SECRET_KEY = "django-insecure-#p#gcycnod&@r_-j%zrt@y#70)24xwpq+=_7ammifcnmvdx$9%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '3.38.241.155']
 
 # Application definition
 
@@ -146,12 +146,13 @@ CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = ["http://*/*", "https://*/*"]
 
 # AWS Setting
-AWS_REGION: Final[str] = "ap-northeast-2"
-AWS_STORAGE_BUCKET_NAME: Final[str] = "delly-djangoblog"
+AWS_REGION: Final[str] = env("AWS_REGION")
+AWS_STORAGE_BUCKET_NAME: Final[str] = env("AWS_BUCKET_NAME")
 AWS_ACCESS_KEY_ID: Final[str] = env("AWS_ACCESS")
 AWS_SECRET_ACCESS_KEY: Final[str] = env("AWS_SECRET_ACCESS")
 
-AWS_S3_CUSTOM_DOMAIN: Final = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com"
+AWS_S3_CUSTOM_DOMAIN: Final = f"{
+    AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com"
 
 # Static Settings ()
 # STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
