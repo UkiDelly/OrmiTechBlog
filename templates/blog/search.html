@@ -45,12 +45,18 @@
                 <a class="overflow-hidden" style="height: 350px" href="{% url 'blog:blog_detail' blog.pk %}">
                     <img
                             class="card-img-top"
-                            src="http://ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com:8080{{ blog.thumbnail.url }}"
+                            src="{{ blog.thumbnail.url }}"
                             alt="..."/>
                 </a>
                 <div class="card-body">
                     <div class="small text-muted">{{ blog.created_at }}</div>
                     <h2 class="card-title h4">{{ blog.title }}</h2>
+                    {% for category in blog.categorys.all %}
+                        <a
+                                class="badge bg-secondary text-decoration-none link-light"
+                                href="{% url 'blog:category_search' category.pk %}"
+                        >{{ category.name }}</a>
+                    {% endfor %}
                     <p class="card-text">{{ blog.content|striptags|truncatechars:200 }}</p>
                     <a class="btn btn-primary" href="{% url 'blog:blog_detail' blog.pk %}">더보기 →</a>
                 </div>
@@ -74,7 +80,7 @@
             const $searchInput = document.getElementsByClassName("search-input")[0];
 
             const searchValue = $searchInput.value;
-            const res = await fetch(`http://ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com:8080/blog/search?q=${searchValue}`, {
+            const res = await fetch(`http://localhost:8080/blog/search?q=${searchValue}`, {
                 method: "GET",
                 redirect: "follow"
             });

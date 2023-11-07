@@ -13,7 +13,6 @@
     <div class="container d-flex flex-column">
         <div class="text-center my-5 ">
             <h1 class="fw-bolder">{{ request.user.nickname }}님의 블로그</h1>
-            <p class="lead mb-0">A Bootstrap 5 starter layout for your next blog homepage</p>
         </div>
 
         <div class="container d-flex flex-row">
@@ -24,7 +23,7 @@
                         <div class="card mb-4">
                             <a href="{% url 'blog:blog_detail' blog.id %}">
                                 <img class="card-img-top"
-                                     src='http://ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com:8080{{ blog.thumbnail.url }}'
+                                     src='{{ blog.thumbnail.url }}'
                                      style="height: 350px"
                                      alt="..."/>
                             </a>
@@ -51,7 +50,7 @@
                         <div class="card mb-4">
                             <a href="{% url 'blog:blog_detail' blog.id %}">
                                 <img class="card-img-top"
-                                     src='http://ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com:8080{{ blog.thumbnail.url }}'
+                                     src='{{ blog.thumbnail.url }}'
                                      style="height: 350px"
                                      alt="..."/>
                             </a>

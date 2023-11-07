@@ -3,10 +3,10 @@
 <!DOCTYPE html>
 <html lang="ko-KR">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>Blog</title>
 </head>
 <body>
@@ -24,7 +24,7 @@
                         <a href="{% url 'blog:blog_detail' most_like.pk %}">
                             <img
                                     class="card-img-top"
-                                    src="http://0.0.0.0:8080{{ most_like.thumbnail.url }}"
+                                    src="{{ most_like.thumbnail.url }}"
                                     alt="..."
                             /></a>
                         <div class="card-body">
@@ -52,45 +52,45 @@
                 <p class="h1">포스트</p>
                 <div class="row">
                     {% for blog in blogs %} {% if blog.pk|divisibleby:2 %}
-                    <div class="col-lg-6">
-                        <div class="card mb-4">
-                            <a class="overflow-hidden" style="max-height: 350px"
-                                href="{% url 'blog:blog_detail' blog.pk %}">
-                                <img height="350px" class="card-img-top" src="{{ blog.thumbnail.url }}" alt="..." />
-                            </a>
-                            <div class="card-body">
-                                <div class="small text-muted">{{ blog.created_at }}</div>
-                                <h2 class="card-title h4">{{ blog.title }}</h2>
-                                <p class="card-text">
-                                    {{ blog.content|striptags|truncatechars:100 }}
-                                </p>
-                                <a class="btn btn-primary" href="{% url 'blog:blog_detail' blog.pk %}">더보기 →</a>
+                        <div class="col-lg-6">
+                            <div class="card mb-4">
+                                <a class="overflow-hidden" style="max-height: 350px"
+                                   href="{% url 'blog:blog_detail' blog.pk %}">
+                                    <img height="350px" class="card-img-top" src="{{ blog.thumbnail.url }}" alt="..."/>
+                                </a>
+                                <div class="card-body">
+                                    <div class="small text-muted">{{ blog.created_at }}</div>
+                                    <h2 class="card-title h4">{{ blog.title }}</h2>
+                                    <p class="card-text">
+                                        {{ blog.content|striptags|truncatechars:100 }}
+                                    </p>
+                                    <a class="btn btn-primary" href="{% url 'blog:blog_detail' blog.pk %}">더보기 →</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     {% else %}
-                    <div class="col-lg-6">
-                        <div class="card mb-4">
-                            <a class="overflow-hidden" style="max-height: 350px"
-                                href="{% url 'blog:blog_detail' blog.pk %}">
-                                <img class="card-img-top" src="{{ blog.thumbnail.url }}" alt="..." />
-                            </a>
-                            <div class="card-body">
-                                <div class="small text-muted">{{ blog.created_at }}</div>
-                                <h2 class="card-title h4">{{ blog.title }}</h2>
-                                <p class="card-text">
-                                    {{ blog.content|striptags|truncatechars:100 }}
-                                </p>
-                                <a class="btn btn-primary" href="{% url 'blog:blog_detail' blog.pk %}">더보기 →</a>
+                        <div class="col-lg-6">
+                            <div class="card mb-4">
+                                <a class="overflow-hidden" style="max-height: 350px"
+                                   href="{% url 'blog:blog_detail' blog.pk %}">
+                                    <img class="card-img-top" src="{{ blog.thumbnail.url }}" alt="..."/>
+                                </a>
+                                <div class="card-body">
+                                    <div class="small text-muted">{{ blog.created_at }}</div>
+                                    <h2 class="card-title h4">{{ blog.title }}</h2>
+                                    <p class="card-text">
+                                        {{ blog.content|striptags|truncatechars:100 }}
+                                    </p>
+                                    <a class="btn btn-primary" href="{% url 'blog:blog_detail' blog.pk %}">더보기 →</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     {% endif %}
                     {% endfor %}
                 </div>
                 <!-- Pagination-->
                 <nav aria-label="Pagination">
-                    <hr class="my-0" />
+                    <hr class="my-0"/>
                     <ul class="pagination justify-content-center my-4">
                         <li class="page-item disabled">
                             <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a>
@@ -99,12 +99,12 @@
                             <a class="page-link" href="#!"> {{ blogs.number }} </a>
                         </li>
                         {% if blogs.has_next %}
-                        <li class="page-item"><a class="page-link" href="#!">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#!">3</a></li>
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#!">...</a>
-                        </li>
-                        <li class="page-item"><a class="page-link" href="#!">15</a></li>
+                            <li class="page-item"><a class="page-link" href="#!">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#!">3</a></li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#!">...</a>
+                            </li>
+                            <li class="page-item"><a class="page-link" href="#!">15</a></li>
                         {% endif %}
                         <li class="page-item">
                             <a class="page-link" href="#!">Older</a>
@@ -120,7 +120,7 @@
                     <div class="card-body">
                         <div class="input-group">
                             <input class="form-control search-input" type="text" placeholder="검색어를 입력하세요..."
-                                aria-label="검색어를 입력하세요..." aria-describedby="button-search" />
+                                   aria-label="검색어를 입력하세요..." aria-describedby="button-search"/>
                             <button class="btn btn-primary" id="button-search" type="button" onclick="searchBlog()">
                                 검색하기
                             </button>
@@ -133,24 +133,24 @@
                     <div class="card-body">
                         <div class="row">
                             {% for category in categorys %}
-                            {% if category.pk|divisibleby:2 %}
-                            <div class="col-sm-6">
-                                <ul class="list-unstyled mb-0">
-                                    <li>
-                                        <a href="{% url 'blog:category_search' c_pk=category.pk %}">
-                                            {{ category.name}}</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            {% else %}
-                            <div class="col-sm-6">
-                                <ul class="list-unstyled mb-0">
-                                    <li>
-                                        <a href="{% url 'blog:category_search' category.pk %}">{{ category.name }}</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            {% endif %}
+                                {% if category.pk|divisibleby:2 %}
+                                    <div class="col-sm-6">
+                                        <ul class="list-unstyled mb-0">
+                                            <li>
+                                                <a href="{% url 'blog:category_search' c_pk=category.pk %}">
+                                                    {{ category.name }}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                {% else %}
+                                    <div class="col-sm-6">
+                                        <ul class="list-unstyled mb-0">
+                                            <li>
+                                                <a href="{% url 'blog:category_search' category.pk %}">{{ category.name }}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                {% endif %}
                             {% endfor %}
 
                         </div>
@@ -167,7 +167,7 @@
 
             const searchValue = $searchInput.value;
             const res = await fetch(
-                `http://ec2-3-36-31-98.ap-northeast-2.compute.amazonaws.com:8080/blog/search?q=${searchValue}`,
+                `http://localhost:8080/blog/search?q=${searchValue}`,
                 {
                     method: 'GET',
                     redirect: 'follow',
@@ -179,6 +179,6 @@
             }
         }
     </script>
-    {% endblock %}
+{% endblock %}
 </body>
 </html>
